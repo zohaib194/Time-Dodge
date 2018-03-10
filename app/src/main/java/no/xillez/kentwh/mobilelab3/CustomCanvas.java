@@ -18,11 +18,13 @@ public class CustomCanvas extends View
     private static final String LOG_TAG_INFO = "Xillez_CustomCanvas [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_CustomCanvas [WARN]";
 
+    private Point wSize;
+    private int MARGIN = 5;
+
     private ShapeDrawable background;
     private CollisionBox backCollBox;
 
-    private Point wSize;
-    private int MARGIN = 5;
+    private Ball ball;
 
     public CustomCanvas(Context context)
     {
@@ -37,9 +39,17 @@ public class CustomCanvas extends View
         makeBackground();
     }
 
+    private void update()
+    {
+
+    }
+
     @Override
     protected void onDraw(Canvas canvas)
     {
+        // Update everything before we draw it.
+        update();
+
         // Draw background
         Log.i(LOG_TAG_INFO, "Drawing on canvas!");
         background.draw(canvas);
