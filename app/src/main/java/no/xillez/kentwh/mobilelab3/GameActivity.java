@@ -5,7 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity
+{
 
     private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_GameActivity [WARN]";
@@ -13,7 +14,8 @@ public class GameActivity extends AppCompatActivity {
     private CustomCanvas customCanvas;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // Set view
@@ -26,12 +28,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
     }
 
     @Override
-    protected void onRestart() {
+    protected void onRestart()
+    {
         super.onRestart();
     }
 }
