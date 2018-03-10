@@ -6,13 +6,13 @@ package no.xillez.kentwh.mobilelab3;
 
 public class CollisionBox
 {
-    public float x, y, z, w;
+    public float left, top, bottom, right;
 
     public CollisionBox(float x, float y, float z, float w)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+        this.left = x;
+        this.top = y;
+        this.bottom = z;
+        this.right = w;
     }
 }
