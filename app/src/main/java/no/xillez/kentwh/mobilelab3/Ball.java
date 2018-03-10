@@ -1,12 +1,13 @@
 package no.xillez.kentwh.mobilelab3;
 
 import android.graphics.Point;
+import android.graphics.drawable.ShapeDrawable;
 
 /**
  * Created by kent on 10.03.18.
  */
 
-public class Ball
+public class Ball extends ShapeDrawable
 {
     Point position;
     Point velocity;
