@@ -3,7 +3,7 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.Point;
 
 /**
- * Created by user on 10.03.18.
+ * Created by kent on 10.03.18.
  */
 
 public class Ball
