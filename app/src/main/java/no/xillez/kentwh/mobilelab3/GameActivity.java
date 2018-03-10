@@ -24,4 +24,14 @@ public class GameActivity extends AppCompatActivity {
         Log.i(LOG_TAG_INFO, "Setting screen orientation!");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
 }
