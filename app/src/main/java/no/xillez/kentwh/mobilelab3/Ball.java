@@ -10,12 +10,14 @@ public class Ball
 {
     Point position;
     Point velocity;
-    Point size;
+    float radius;
+    CollisionBox collBox;
 
-    public Ball(Point position, Point velocity, Point size)
+    public Ball(Point position, Point velocity, float radius)
     {
         this.position = position;
         this.velocity = velocity;
-        this.size = size;
+        this.radius = radius;
+        this.collBox = new CollisionBox(position.x, position.y, position.x + radius, position.y + radius);
     }
 }
