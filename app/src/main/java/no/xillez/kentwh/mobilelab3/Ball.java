@@ -25,7 +25,7 @@ public class Ball extends ShapeDrawable
 
     public void update(float dt)
     {
-        position.x += -velocity.y * dt; //acceleration * dt;
+        position.x += velocity.y * dt; //acceleration * dt;
         position.y += velocity.x * dt; //acceleration * dt;
 
         // Update position and collision box
