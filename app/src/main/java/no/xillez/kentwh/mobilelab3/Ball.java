@@ -1,11 +1,9 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.graphics.drawable.shapes.Shape;
-import android.support.annotation.NonNull;
 
 /**
  * Created by kent on 10.03.18.
@@ -14,7 +12,8 @@ import android.support.annotation.NonNull;
 public class Ball extends ShapeDrawable
 {
     private Point position;
-    private Point velocity;
+    private PointF velocity;
+    //private PointF acceleration;
     private int radius;
     private int color;
     public CollisionBox collBox;
@@ -26,10 +25,12 @@ public class Ball extends ShapeDrawable
 
     public void update(float dt)
     {
-        // Update the color to GREEN
-        this.getPaint().setColor(color);
+        position.x += -velocity.y * dt; //acceleration * dt;
+        position.x += velocity.x * dt; //acceleration * dt;
+
         // Update position and collision box
         this.setBounds(position.x, position.y, position.x + radius, position.y + radius);
+
         // Update collision box
         this.collBox = new CollisionBox(position.x, position.y, position.x + radius, position.y + radius);
     }
@@ -44,14 +45,20 @@ public class Ball extends ShapeDrawable
         this.position = position;
     }
 
-    public Point getVelocity()
+    public PointF getVelocity()
     {
         return velocity;
     }
 
-    public void setVelocity(Point velocity)
+    public void setVelocity(PointF velocity)
     {
         this.velocity = velocity;
+    }
+
+    public void setVelocity(float x, float y)
+    {
+        this.velocity.x = x;
+        this.velocity.y = y;
     }
 
     public int getColor()
