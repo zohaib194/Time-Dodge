@@ -28,6 +28,8 @@ public class Ball extends ShapeDrawable
         position.x += velocity.y * dt; //acceleration * dt;
         position.y += velocity.x * dt; //acceleration * dt;
 
+        this.getPaint().setColor(color);
+
         // Update position and collision box
         this.setBounds(position.x, position.y, position.x + radius, position.y + radius);
 
