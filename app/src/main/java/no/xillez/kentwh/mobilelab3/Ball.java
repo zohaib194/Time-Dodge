@@ -1,6 +1,5 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -11,40 +10,68 @@ import android.graphics.drawable.shapes.OvalShape;
 
 public class Ball extends ShapeDrawable
 {
-    private Point position;
-    private PointF velocity;
-    //private PointF acceleration;
-    private int radius;
-    private int color;
-    public CollisionBox collBox;
+    private PointF position = new PointF(0.0f, 0.0f);
+    private PointF velocity = new PointF(0.0f, 0.0f);
+    private PointF acceleration = new PointF(0.0f, 0.0f);
+    private int diameter = 0;
+    private int color = 0;
+    private CollisionBox collBox = new CollisionBox(0, 0, 0, 0);
 
-    public Ball()
+    Ball()
     {
         super(new OvalShape());
     }
 
-    public void update(float dt)
+    void update(float dt, CollisionBox collBox)
     {
-        position.x += velocity.y * dt; //acceleration * dt;
-        position.y += velocity.x * dt; //acceleration * dt;
+        // Find new velocity based on acceleration (in landscape mode x and y is switched)
+        velocity.x += acceleration.y * 4.0f * dt;
+        velocity.y += acceleration.x * 4.0f * dt;
 
+        // Update color if changed
         this.getPaint().setColor(color);
 
-        // Update position and collision box
-        this.setBounds(position.x, position.y, position.x + radius, position.y + radius);
+        // Get the collision state
+        CollisionState collState = isCollidingWithin(collBox);
+        this.setVelocity(((collState.left || collState.right) ? 0.0f : velocity.x), ((collState.top || collState.bottom) ? 0.0f : velocity.y));
 
-        // Update collision box
-        this.collBox = new CollisionBox(position.x, position.y, position.x + radius, position.y + radius);
+        // Update position with velocity and collision on x-axis and y-axis
+        this.setPosition(((collState.left) ? collBox.left :
+                                ((collState.right) ? collBox.right - diameter : position.x + velocity.x)),
+                         ((collState.top) ? collBox.top :
+                                ((collState.bottom) ? collBox.bottom - diameter : position.y + velocity.y)));
+
+
+        // Update position and collision box
+        this.setBounds((int) position.x, (int) position.y, (int) position.x + diameter, (int) position.y + diameter);
+        this.updateCollBox();
     }
 
-    public Point getPosition()
+    private CollisionState isCollidingWithin(CollisionBox collBox)
+    {                           // Going left        Ball going to pass background left?
+        return new CollisionState((velocity.x < 0 && this.collBox.left + velocity.x < collBox.left),
+                                // Going up          Ball going to pass background top?
+                                  (velocity.y < 0 && this.collBox.top + velocity.y < collBox.top),
+                                // Going down        Ball going to pass backgrounds down?
+                                  (velocity.y > 0 && this.collBox.bottom + velocity.y > collBox.bottom),
+                                // Going right       Ball right hits backgrounds right
+                                  (velocity.x > 0 && this.collBox.right + velocity.x > collBox.right));
+    }
+
+    public PointF getPosition()
     {
         return position;
     }
 
-    public void setPosition(Point position)
+    void setPosition(PointF position)
     {
         this.position = position;
+    }
+
+    void setPosition(float x, float y)
+    {
+        this.position.x = x;
+        this.position.y = y;
     }
 
     public PointF getVelocity()
@@ -52,15 +79,31 @@ public class Ball extends ShapeDrawable
         return velocity;
     }
 
-    public void setVelocity(PointF velocity)
+    void setVelocity(PointF velocity)
     {
         this.velocity = velocity;
     }
 
-    public void setVelocity(float x, float y)
+    private void setVelocity(float x, float y)
     {
         this.velocity.x = x;
         this.velocity.y = y;
+    }
+
+    public PointF getAcceleration()
+    {
+        return acceleration;
+    }
+
+    public void setAcceleration(PointF acceleration)
+    {
+        this.acceleration = acceleration;
+    }
+
+    void setAcceleration(float x, float y)
+    {
+        this.acceleration.x = x;
+        this.acceleration.y = y;
     }
 
     public int getColor()
@@ -73,13 +116,36 @@ public class Ball extends ShapeDrawable
         this.color = color;
     }
 
-    public int getRadius()
+    int getDiameter()
     {
-        return radius;
+        return diameter;
     }
 
-    public void setRadius(int radius)
+    void setDiameter(int diameter)
     {
-        this.radius = radius;
+        this.diameter = diameter;
+    }
+
+    public CollisionBox getCollBox()
+    {
+        return collBox;
+    }
+
+    public void setCollBox(CollisionBox collBox)
+    {
+        this.collBox = collBox;
+    }
+
+    public void setCollBox(int left, int top, int bottom, int right)
+    {
+        this.collBox.left = left;
+        this.collBox.top = top;
+        this.collBox.bottom = bottom;
+        this.collBox.right = right;
+    }
+
+    public void updateCollBox()
+    {
+        this.collBox = new CollisionBox(position.x, position.y, position.x + diameter, position.y + diameter);
     }
 }
