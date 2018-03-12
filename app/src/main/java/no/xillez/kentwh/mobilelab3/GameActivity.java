@@ -20,10 +20,6 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
     private SensorManager sensorManager;
     public Sensor sensor;
 
-    /*private TextView xView;
-    private TextView yView;
-    private TextView zView;*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -43,21 +39,21 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
         sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        // Register the sensor listener
         Log.i(LOG_TAG_INFO, "Tying to register sensor!");
         sensorManager.registerListener(gameCanvas, sensor, SensorManager.SENSOR_DELAY_GAME);
 
         // Give it to Canvas
         Log.i(LOG_TAG_INFO, "Passing on sensor to canvas!");
         gameCanvas.setSensor(sensor);
-
-        /*this.xView = findViewById(R.id.game_textview01);
-        this.yView = findViewById(R.id.game_textview02);*/
     }
 
     @Override
     protected void onPause()
     {
         super.onPause();
+
+        // Un-register sensor listener
         Log.i(LOG_TAG_INFO, "App paused, un-registering sensor listener");
         sensorManager.unregisterListener(gameCanvas);
     }
@@ -66,20 +62,12 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
     protected void onResume()
     {
         super.onResume();
+
+        // Re-register sensor listener
         Log.i(LOG_TAG_INFO, "App un-paused, registering sensor listener");
         sensorManager.registerListener(gameCanvas, sensor, SensorManager.SENSOR_DELAY_GAME);
+
+        // Log first drawing even after resume
+        if (gameCanvas.isLoggingFirstDrawEvent()) gameCanvas.setLoggingFirstDrawEvent(true);
     }
-
-    /*@Override
-    public void onSensorChanged(SensorEvent event)
-    {
-        xView.setText("" + event.values[0]);
-        yView.setText("" + event.values[1]);
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy)
-    {
-
-    }*/
 }

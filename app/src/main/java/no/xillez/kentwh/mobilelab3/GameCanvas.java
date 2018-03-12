@@ -22,6 +22,8 @@ public class GameCanvas extends View implements SensorEventListener
     // Logging variables
     private static final String LOG_TAG_INFO = "Xillez_CustomCanvas [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_CustomCanvas [WARN]";
+    private static final String LOG_TAG_ERROR = "Xillez_CustomCanvas [ERROR]";
+    private boolean logDrawing = true;
 
     // Canvas variables
     private Point wSize;
@@ -70,36 +72,46 @@ public class GameCanvas extends View implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        // If the sensor exists, use data from it to update velocity
-        if (sensor != null)
-            ball.setVelocity(event.values[0], event.values[1]);
+        // Sensor isn't set, return
+        if (sensor == null)
+        {
+            Log.e(LOG_TAG_ERROR, "No sensor avaliable!");
+            return;
+        }
+
+        // Use data from sensor to update velocity
+        ball.setAcceleration(event.values[0], event.values[1]);
+        //ball.update();
+
+        // New data is available, current UI/frame is invalid
+        invalidate();
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
-    private void update(float dt)
-    {
-        ball.update(dt);
-    }
-
     @Override
     protected void onDraw(Canvas canvas)
     {
+        if (logDrawing)
+            Log.i(LOG_TAG_INFO, "Updating and drawing the background and ball on canvas!");
+
         // Get time since last frame
         curr_time = System.currentTimeMillis();
         dt = (curr_time - prev_time) / 1000.0f;
         prev_time = curr_time;
 
-        // Not updateing with negative time? if not update everything
-        Log.i(LOG_TAG_INFO, "Updating all data that need to be updated!");
+        // Is dt a valid value, if so, update ball
         if (dt >= 0.0f)
-            update(dt);
+            ball.update(dt, backCollBox);
 
         // Draw background and ball
-        Log.i(LOG_TAG_INFO, "Drawing background and ball on canvas!");
         background.draw(canvas);
         ball.draw(canvas);
+
+        // Disable draw logging after first time
+        if (logDrawing)
+            logDrawing = false;
     }
 
     @Override
@@ -120,9 +132,20 @@ public class GameCanvas extends View implements SensorEventListener
     private void makeBall()
     {
         // Set ball's color, position, velocity, radius and collision box
-        ball.setRadius(50);
-        ball.setPosition(new Point(wSize.x / 2 - ball.getRadius() / 2, wSize.y / 2 - ball.getRadius() / 2));
+        ball.setDiameter(50);
+        ball.setPosition(new PointF(wSize.x / 2 - ball.getDiameter() / 2, wSize.y / 2 - ball.getDiameter() / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
+        ball.updateCollBox();
+    }
+
+    public boolean isLoggingFirstDrawEvent()
+    {
+        return logDrawing;
+    }
+
+    public void setLoggingFirstDrawEvent(boolean logDrawing)
+    {
+        this.logDrawing = logDrawing;
     }
 }
