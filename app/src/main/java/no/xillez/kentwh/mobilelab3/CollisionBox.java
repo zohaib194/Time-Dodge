@@ -8,11 +8,11 @@ public class CollisionBox
 {
     public float left, top, bottom, right;
 
-    public CollisionBox(float x, float y, float z, float w)
+    public CollisionBox(float left, float top, float bottom, float right)
     {
-        this.left = x;
-        this.top = y;
-        this.bottom = z;
-        this.right = w;
+        this.left = left;
+        this.top = top;
+        this.bottom = bottom;
+        this.right = right;
     }
 }
