@@ -1,14 +1,17 @@
 package no.xillez.kentwh.mobilelab3;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-public class GameActivity extends AppCompatActivity// implements SensorEventListener
+public class GameActivity extends AppCompatActivity implements Ball.BallCollideCallback
 {
 
     private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
@@ -18,7 +21,10 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
 
     // SensorManagers
     private SensorManager sensorManager;
-    public Sensor sensor;
+    private Sensor sensor;
+
+    // Vibrator
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,8 +37,16 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
         gameCanvas = new GameCanvas(getApplicationContext());
         setContentView(gameCanvas);
 
+        // Set screen orientation
         Log.i(LOG_TAG_INFO, "Setting screen orientation!");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        // Get Vibrator
+        // TODO: GET THIS NOT TO BE NULL!!!
+        Log.i(LOG_TAG_INFO, "Tying to find vibrator!");
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator == null)
+            Log.i(LOG_TAG_WARN, "Vibrator is null!");
 
         // Get accelerometer
         Log.i(LOG_TAG_INFO, "Finding acceleration sensor (accelerometer)!");
@@ -43,9 +57,10 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
         Log.i(LOG_TAG_INFO, "Tying to register sensor!");
         sensorManager.registerListener(gameCanvas, sensor, SensorManager.SENSOR_DELAY_GAME);
 
-        // Give it to Canvas
-        Log.i(LOG_TAG_INFO, "Passing on sensor to canvas!");
+        // Give sensor and vibrator to Canvas
+        Log.i(LOG_TAG_INFO, "Passing on sensor and vibrator to canvas!");
         gameCanvas.setSensor(sensor);
+        gameCanvas.registerCollsionCallback_OnBall(this);
     }
 
     @Override
@@ -69,5 +84,19 @@ public class GameActivity extends AppCompatActivity// implements SensorEventList
 
         // Log first drawing even after resume
         if (gameCanvas.isLoggingFirstDrawEvent()) gameCanvas.setLoggingFirstDrawEvent(true);
+    }
+
+    @Override
+    public void triggerVibration()
+    {
+        if (vibrator != null)
+            vibrator.vibrate(50);
+    }
+
+    @Override
+    public void triggerSound()
+    {
+        if (vibrator != null)
+            vibrator.vibrate(VibrationEffect.DEFAULT_AMPLITUDE);
     }
 }
