@@ -20,6 +20,8 @@ public class Ball extends ShapeDrawable
     private CollisionBox collBox = new CollisionBox(0, 0, 0, 0);
     private BallCollideCallback callback = null;
 
+    // Last collision state
+    boolean prevCollState = false;
 
     // Vibrator
     private Vibrator vibrator;
@@ -52,9 +54,15 @@ public class Ball extends ShapeDrawable
         // Did we collide? if so make GameActivity vibrate phone
         if (collState.left || collState.right || collState.top || collState.bottom)
         {
+            // trigger vibration
             callback.triggerVibration();
-            callback.triggerSound();
+
+
+            // If no collision previous update, play sound
+            if (!prevCollState) callback.triggerSound();
+            prevCollState = true;
         }
+        else prevCollState = false;
 
         // Update position and collision box
         this.setBounds((int) position.x, (int) position.y, (int) position.x + diameter, (int) position.y + diameter);
