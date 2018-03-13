@@ -51,8 +51,13 @@ public class Ball extends ShapeDrawable
                          ((collState.top) ? collBox.top :
                                 ((collState.bottom) ? collBox.bottom - diameter : position.y + velocity.y)));
 
+
         // Did we collide? if so make GameActivity vibrate phone
-        if (collState.left || collState.right || collState.top || collState.bottom) callback.triggerVibration();
+        if (collState.left || collState.right || collState.top || collState.bottom)
+        {
+            callback.triggerVibration();
+            callback.triggerSound();
+        }
 
         // Update position and collision box
         this.setBounds((int) position.x, (int) position.y, (int) position.x + diameter, (int) position.y + diameter);
