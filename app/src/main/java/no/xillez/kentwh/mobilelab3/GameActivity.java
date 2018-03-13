@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.os.VibrationEffect;
+import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import android.util.Log;
 
 public class GameActivity extends AppCompatActivity implements Ball.BallCollideCallback
 {
-
     private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_GameActivity [WARN]";
 
@@ -25,6 +24,9 @@ public class GameActivity extends AppCompatActivity implements Ball.BallCollideC
 
     // Vibrator
     private Vibrator vibrator;
+
+    // Media player variables
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,11 +44,14 @@ public class GameActivity extends AppCompatActivity implements Ball.BallCollideC
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // Get Vibrator
-        // TODO: GET THIS NOT TO BE NULL!!!
         Log.i(LOG_TAG_INFO, "Tying to find vibrator!");
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator == null)
             Log.i(LOG_TAG_WARN, "Vibrator is null!");
+
+        // Make a media play to play boop sound
+        Log.i(LOG_TAG_INFO, "Trying to get media player!");
+        mediaPlayer = MediaPlayer.create(this, R.raw.boop);
 
         // Get accelerometer
         Log.i(LOG_TAG_INFO, "Finding acceleration sensor (accelerometer)!");
@@ -89,6 +94,7 @@ public class GameActivity extends AppCompatActivity implements Ball.BallCollideC
     @Override
     public void triggerVibration()
     {
+        // Vibrator exists? Vibrate!
         if (vibrator != null)
             vibrator.vibrate(50);
     }
@@ -96,7 +102,8 @@ public class GameActivity extends AppCompatActivity implements Ball.BallCollideC
     @Override
     public void triggerSound()
     {
-        if (vibrator != null)
-            vibrator.vibrate(VibrationEffect.DEFAULT_AMPLITUDE);
+        // Media player exists? Play sound!
+        if (mediaPlayer != null)
+            mediaPlayer.start();
     }
 }
