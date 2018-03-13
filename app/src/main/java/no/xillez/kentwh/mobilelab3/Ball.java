@@ -3,10 +3,7 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.PointF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.os.Parcel;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 
 /**
  * Created by kent on 10.03.18.
