@@ -60,7 +60,7 @@ public class GameActivity extends AppCompatActivity implements Ball.BallCollideC
         // Give sensor and vibrator to Canvas
         Log.i(LOG_TAG_INFO, "Passing on sensor and vibrator to canvas!");
         gameCanvas.setSensor(sensor);
-        gameCanvas.registerCollsionCallback_OnBall(this);
+        gameCanvas.registerCollisionCallback_OnBall(this);
     }
 
     @Override

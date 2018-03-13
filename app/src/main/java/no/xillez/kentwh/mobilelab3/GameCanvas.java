@@ -10,6 +10,8 @@ import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 
@@ -81,7 +83,6 @@ public class GameCanvas extends View implements SensorEventListener
 
         // Use data from sensor to update velocity
         ball.setAcceleration(event.values[0], event.values[1]);
-        //ball.update();
 
         // New data is available, current UI/frame is invalid
         invalidate();
@@ -126,7 +127,7 @@ public class GameCanvas extends View implements SensorEventListener
         background = new ShapeDrawable(new RectShape());
         background.getPaint().setColor(Color.DKGRAY);
         background.setBounds(MARGIN, MARGIN, wSize.x - MARGIN, wSize.y - MARGIN);
-        backCollBox = new CollisionBox(MARGIN, MARGIN, wSize.x - MARGIN, wSize.y - MARGIN);
+        backCollBox = new CollisionBox(MARGIN, MARGIN, wSize.y - MARGIN, wSize.x - MARGIN);
     }
 
     private void makeBall()
@@ -137,6 +138,13 @@ public class GameCanvas extends View implements SensorEventListener
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
         ball.updateCollBox();
+    }
+
+    public void registerCollisionCallback_OnBall(GameActivity gameActivity)
+    {
+        // Relay the registration of collision callback to the ball, if it exists
+        if (ball != null)
+            ball.registerCallback(gameActivity);
     }
 
     public boolean isLoggingFirstDrawEvent()
