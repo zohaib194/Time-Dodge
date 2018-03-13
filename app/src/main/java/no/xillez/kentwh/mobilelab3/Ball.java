@@ -3,6 +3,10 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.PointF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.os.Parcel;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 
 /**
  * Created by kent on 10.03.18.
@@ -10,12 +14,18 @@ import android.graphics.drawable.shapes.OvalShape;
 
 public class Ball extends ShapeDrawable
 {
+    // Ball properties
     private PointF position = new PointF(0.0f, 0.0f);
     private PointF velocity = new PointF(0.0f, 0.0f);
     private PointF acceleration = new PointF(0.0f, 0.0f);
     private int diameter = 0;
     private int color = 0;
     private CollisionBox collBox = new CollisionBox(0, 0, 0, 0);
+    private BallCollideCallback callback = null;
+
+
+    // Vibrator
+    private Vibrator vibrator;
 
     Ball()
     {
@@ -41,6 +51,8 @@ public class Ball extends ShapeDrawable
                          ((collState.top) ? collBox.top :
                                 ((collState.bottom) ? collBox.bottom - diameter : position.y + velocity.y)));
 
+        // Did we collide? if so make GameActivity vibrate phone
+        if (collState.left || collState.right || collState.top || collState.bottom) callback.triggerVibration();
 
         // Update position and collision box
         this.setBounds((int) position.x, (int) position.y, (int) position.x + diameter, (int) position.y + diameter);
@@ -144,8 +156,27 @@ public class Ball extends ShapeDrawable
         this.collBox.right = right;
     }
 
-    public void updateCollBox()
+    void updateCollBox()
     {
-        this.collBox = new CollisionBox(position.x, position.y, position.x + diameter, position.y + diameter);
+        this.collBox.left = position.x;
+        this.collBox.top = position.y;
+        this.collBox.bottom = position.y + diameter;
+        this.collBox.right = position.x + diameter;
+    }
+
+    void setVibrator(Vibrator vibrator)
+    {
+        this.vibrator = vibrator;
+    }
+
+    public void registerCallback(BallCollideCallback callback)
+    {
+        this.callback = callback;
+    }
+
+    interface BallCollideCallback
+    {
+        void triggerVibration();
+        void triggerSound();
     }
 }
