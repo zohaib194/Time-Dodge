@@ -27,4 +27,8 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     public void actionStartSetting(View view){
         // TODO: Start settings activity
     }
+
+    public void actionStartHighScore(View view){
+        // TODO: Start high score activity
+    }
 }

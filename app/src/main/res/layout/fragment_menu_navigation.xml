@@ -31,9 +31,24 @@
         android:layout_marginTop="8dp"
         android:onClick="actionStartSetting"
         android:text="@string/btnSetting"
+        app:layout_constraintBottom_toTopOf="@id/btnHighScore"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnStart"/>
+
+    <Button
+        android:id="@+id/btnHighScore"
+        android:layout_width="221dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="actionStartHighScore"
+        android:text="@string/btnHighScore"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnStart" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSetting"/>
 </android.support.constraint.ConstraintLayout>
 
