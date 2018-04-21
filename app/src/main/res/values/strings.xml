@@ -5,4 +5,5 @@
     <string name="btnStart">Play Game</string>
     <string name="btnSetting">Settings</string>
     <string name="btnHighScore">High score</string>
+    <string name="highscore">Highscore</string>
 </resources>
