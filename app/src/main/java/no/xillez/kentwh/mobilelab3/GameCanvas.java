@@ -36,19 +36,21 @@ public class GameCanvas extends View implements SensorEventListener
     private Sensor sensor;
 
     // Background variables
-    private ShapeDrawable background;
-    private CollisionBox backCollBox;
+    private GameObject background;
 
-    //Ball variables
+    // Ball
     private Ball ball;
+
+    // Debris
+    private Debris debri;
 
     public GameCanvas(Context context)
     {
         super(context);
-        wSize = new Point();
 
         // Get screen dimensions
         Log.i(LOG_TAG_INFO, "Getting screen size!");
+        wSize = new Point();
         wSize.set(context.getResources().getDisplayMetrics().widthPixels, context.getResources().getDisplayMetrics().heightPixels);
 
         // Setup background
@@ -57,8 +59,11 @@ public class GameCanvas extends View implements SensorEventListener
 
         // Setup ball
         Log.i(LOG_TAG_INFO, "Making the ball!");
-        ball = new Ball();
         makeBall();
+
+        // Setup debris
+        Log.i(LOG_TAG_INFO, "Making the debri!");
+        makeDebris();
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
@@ -79,7 +84,7 @@ public class GameCanvas extends View implements SensorEventListener
             return;
         }
 
-        // Use data from sensor to update velocity
+        // Use data from sensor to update game objects
         ball.setAcceleration(event.values[0], event.values[1]);
 
         // New data is available, current UI/frame is invalid
@@ -100,13 +105,19 @@ public class GameCanvas extends View implements SensorEventListener
         dt = (curr_time - prev_time) / 1000.0f;
         prev_time = curr_time;
 
-        // Is dt a valid value, if so, update ball
+        // Is dt a valid value, if so, update game objects
         if (dt >= 0.0f)
-            ball.update(dt, backCollBox);
+        {
 
-        // Draw background and ball
+
+            ball.update(dt, background);
+            debri.update(dt, background);
+        }
+
+        // Draw background, ball and debris
         background.draw(canvas);
         ball.draw(canvas);
+        debri.draw(canvas);
 
         // Disable draw logging after first time
         if (logDrawing)
@@ -122,20 +133,31 @@ public class GameCanvas extends View implements SensorEventListener
     private void makeBackground()
     {
         // Make new rectangle shape, set it's color, position and collision box
-        background = new ShapeDrawable(new RectShape());
+        background = new GameObject(new RectShape());
         background.getPaint().setColor(Color.DKGRAY);
         background.setBounds(MARGIN, MARGIN, wSize.x - MARGIN, wSize.y - MARGIN);
-        backCollBox = new CollisionBox(MARGIN, MARGIN, wSize.y - MARGIN, wSize.x - MARGIN);
     }
 
     private void makeBall()
     {
         // Set ball's color, position, velocity, radius and collision box
-        ball.setDiameter(50);
-        ball.setPosition(new PointF(wSize.x / 2 - ball.getDiameter() / 2, wSize.y / 2 - ball.getDiameter() / 2));
+        ball = new Ball();
+        ball.setRadius(25);
+        ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
-        ball.updateCollBox();
+    }
+
+    private void makeDebris()
+    {
+        // Set ball's color, position, velocity, radius and collision box
+        debri = new Debris();
+        debri.setRadius(25);
+        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2)),
+                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2))));
+        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.025f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.025f));
+        debri.setColor(Color.BLUE);
     }
 
     public void registerCollisionCallback_OnBall(GameActivity gameActivity)

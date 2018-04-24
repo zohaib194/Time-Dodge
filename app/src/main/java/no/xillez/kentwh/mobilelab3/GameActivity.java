@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-public class GameActivity extends AppCompatActivity implements Ball.BallCollideCallback
+public class GameActivity extends AppCompatActivity implements GameObject.GameObjectCollideCallback
 {
     private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_GameActivity [WARN]";
