@@ -37,7 +37,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TW1" />
+        app:layout_constraintTop_toBottomOf="@+id/TW1"
+
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp"
+        android:scrollbarStyle="insideInset"
+        />
 
     <Button
         android:id="@+id/B1"

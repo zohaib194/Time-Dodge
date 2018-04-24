@@ -1,0 +1,9 @@
+TODO
+
+	- Restrict fetching from DB --- (Discuss if a new player should be able to see himself in highscore or restrict highscore threshold so that only players pass a certain number will appear in highscore or limit overall to for example 1000 or 500).
+
+	- Custom listView a line in middle --- (kindaof DONE)
+	- Background (depended on Eldar who is depended on Kent who is depended on game) 
+	- Scroll bar outside listview --- (DONE)
+	- Top5, Top10 and overall button ---  (DONE)
+	- GameOver fragment
