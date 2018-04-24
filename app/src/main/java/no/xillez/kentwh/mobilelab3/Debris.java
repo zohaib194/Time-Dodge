@@ -32,7 +32,7 @@ public class Debris extends GameObject
         // Get the collision state an bounce if hit
         //boolean collState = isColliding(gameObject);
 
-        if (isColliding(gameObject))
+        if (checkCollisionWithOutsideRadius(gameObject))
         {
             // Find vector between objects
             //PointF vector = new PointF(this.getPosition().x - gameObject.getPosition().x,

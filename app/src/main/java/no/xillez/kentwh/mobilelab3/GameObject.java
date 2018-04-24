@@ -17,6 +17,11 @@ public class GameObject extends ShapeDrawable
 
     protected GameObjectCollideCallback callback = null;
 
+    /* TODO:
+     - Add ArrayList for saving collision information (one containter class containing information about new directions) and run through this list in update.
+     - Save the collision with background in single variable. If no collision (variable is (0, 0, 0, 0)), then nothing is added/removed/modified.
+     */
+
     GameObject(Shape shape)
     {
         super(shape);
