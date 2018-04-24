@@ -30,5 +30,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
     public void actionStartHighScore(View view){
         // TODO: Start high score activity
+        Intent intent = new Intent(this, HighscoreActivity.class);
+        startActivity(intent);
     }
 }
