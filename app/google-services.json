@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "419752442556",
+    "firebase_url": "https://timedodge-1b598.firebaseio.com",
+    "project_id": "timedodge-1b598",
+    "storage_bucket": "timedodge-1b598.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419752442556:android:0a7a5ccfdf03f950",
+        "android_client_info": {
+          "package_name": "no.xillez.kentwh.mobilelab3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419752442556-8daf3tjh3qsmsc7fbq5d66cifg6dub3a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "no.xillez.kentwh.mobilelab3",
+            "certificate_hash": "9d379099b2c405403381e06ab2f3243f2185685e"
+          }
+        },
+        {
+          "client_id": "419752442556-mnd6o33pknfvg5lqoef142joci0oga6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASMCvnie8IaTkE2HzvBnuHFWXYfBxVzSA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419752442556-mnd6o33pknfvg5lqoef142joci0oga6u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
