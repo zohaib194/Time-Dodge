@@ -17,7 +17,7 @@ import android.view.View;
  * Created by kent on 10.03.18.
  */
 
-public class GameCanvas extends View implements SensorEventListener
+public class GameCanvas extends View implements SensorEventListener//, GameObject.GameObjectInteractionCallback
 {
     // Logging variables
     private static final String LOG_TAG_INFO = "Xillez_CustomCanvas [INFO]";
@@ -108,8 +108,12 @@ public class GameCanvas extends View implements SensorEventListener
         // Is dt a valid value, if so, update game objects
         if (dt >= 0.0f)
         {
+            // Record all collisions for all game objects
+            ball.checkCollisionWithinSquareBounds(background);
+            ball.checkCollisionWithOutsideRadius(debri);
+            debri.checkCollisionWithinSquareBounds(background);
 
-
+            // Update game objects
             ball.update(dt, background);
             debri.update(dt, background);
         }
@@ -146,6 +150,7 @@ public class GameCanvas extends View implements SensorEventListener
         ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
+        //ball.registerInteractionCallback(this);
     }
 
     private void makeDebris()
@@ -155,16 +160,16 @@ public class GameCanvas extends View implements SensorEventListener
         debri.setRadius(25);
         debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2)),
                 (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2))));
-        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.025f,
-                (ball.getPosition().y - debri.getPosition().y) * 0.025f));
+        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
         debri.setColor(Color.BLUE);
     }
 
-    public void registerCollisionCallback_OnBall(GameActivity gameActivity)
+    public void registerCollisionCallback(GameObject.GameObjectCollisionCallback gameActivity)
     {
-        // Relay the registration of collision callback to the ball, if it exists
+        // Relay the registration of collision collisionCallback to the ball, if it exists
         if (ball != null)
-            ball.registerCallback(gameActivity);
+            ball.registerCollisionCallback(gameActivity);
     }
 
     public boolean isLoggingFirstDrawEvent()
@@ -176,4 +181,13 @@ public class GameCanvas extends View implements SensorEventListener
     {
         this.logDrawing = logDrawing;
     }
+
+    /*@Override
+    public void triggerRespawn(GameObject gameObject)
+    {
+        gameObject.respawn(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4)),
+                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4))),
+        new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
+    }*/
 }

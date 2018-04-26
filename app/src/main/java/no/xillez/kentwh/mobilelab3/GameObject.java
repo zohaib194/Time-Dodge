@@ -3,6 +3,9 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.PointF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
+import android.os.CountDownTimer;
+
+import java.util.ArrayList;
 
 /**
  * Created by kent on 19.04.18.
@@ -15,12 +18,23 @@ public class GameObject extends ShapeDrawable
     protected PointF velocity = new PointF(0.0f, 0.0f);
     protected PointF acceleration = new PointF(0.0f, 0.0f);
 
-    protected GameObjectCollideCallback callback = null;
+    protected GameObjectCollisionCallback collisionCallback = null;
+    //protected GameObjectInteractionCallback interactionCallback = null;
 
-    /* TODO:
-     - Add ArrayList for saving collision information (one containter class containing information about new directions) and run through this list in update.
-     - Save the collision with background in single variable. If no collision (variable is (0, 0, 0, 0)), then nothing is added/removed/modified.
-     */
+    protected ArrayList<PointF> collisions = new ArrayList<>();
+    protected CollisionState backgroundCollState = new CollisionState(false, false, false, false);
+
+    /*CountDownTimer respawnCountDownTimer = new CountDownTimer(1000, 1) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+        }
+
+        @Override
+        public void onFinish() {
+            callbackRespawn();
+        }
+    };*/
 
     GameObject(Shape shape)
     {
@@ -31,11 +45,8 @@ public class GameObject extends ShapeDrawable
 
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
     {
-        // Find radii of objects
-        float thisRadius = (this.getBounds().width() / 2);
-
-        // Get collision state
-        CollisionState collState = new CollisionState(
+        // Save background collision state for later updating
+        backgroundCollState = new CollisionState(
                 // Going left        Ball going to pass background's left?
                 (velocity.x < 0 && this.getBounds().left + velocity.x < gameObject.getBounds().left),
                 // Going up          Ball going to pass background's top?
@@ -43,21 +54,9 @@ public class GameObject extends ShapeDrawable
                 // Going down        Ball going to pass background's down?
                 (velocity.y > 0 && this.getBounds().bottom + velocity.y > gameObject.getBounds().bottom),
                 // Going right       Ball right hits background's right?
-                (velocity.x > 0 && this.getBounds().right + velocity.x > gameObject.getBounds().right));
+                (velocity.x > 0 && this.getBounds().right + velocity.x > gameObject.getBounds().right));;
 
-        // Set velocity according to collision state
-        this.setVelocity(((collState.left || collState.right) ? velocity.x * -1 * 0.75f : velocity.x),
-                ((collState.top || collState.bottom) ? velocity.y * -1 * 0.75f : velocity.y));
-
-        // Update position with velocity and collision on x-axis and y-axis
-        this.setPosition(new PointF(((collState.left) ? gameObject.getBounds().left + thisRadius :
-                ((collState.right) ? gameObject.getBounds().right - thisRadius :
-                        position.x + velocity.x)),
-                ((collState.top) ? gameObject.getBounds().top + thisRadius :
-                        ((collState.bottom) ? gameObject.getBounds().bottom - thisRadius :
-                                position.y + velocity.y))));
-
-        return collState;
+        return backgroundCollState;
     }
 
     protected boolean checkCollisionWithOutsideRadius(GameObject gameObject)
@@ -67,14 +66,38 @@ public class GameObject extends ShapeDrawable
         float gameObjRadius = (gameObject.getBounds().width() / 2);
 
         // Find vector between objects
-        PointF vector = new PointF(this.getPosition().x - gameObject.getPosition().x,
-                this.getPosition().y - gameObject.getPosition().y);
+        PointF vector = new PointF((this.getPosition().x - gameObject.getPosition().x),
+                (this.getPosition().y - gameObject.getPosition().y));
 
         // Calc the distance between objects
         float diff = (float) (Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) - thisRadius - gameObjRadius);
 
+        // If any interesting results
+        if (diff <= 0)
+        {
+            vector = new PointF(vector.x * 0.1f, vector.y * 0.1f);
+
+            // Save collision state for later updating
+            if (!collisions.contains(vector))
+                collisions.add(vector);
+
+            // Make other gameObject reason collision and update later
+            gameObject.saveCollision(new PointF(-vector.x, -vector.y));
+        }
+
         return (diff <= 0);
     }
+
+    /*public void callbackRespawn()
+    {
+        interactionCallback.triggerRespawn(getParentGameObject());
+    }
+
+    public void respawn(PointF pos, PointF vel)
+    {
+        this.setPosition(pos);
+        this.setVelocity(vel);
+    }*/
 
     /*protected float dot(PointF vec1, PointF vec2)
     {
@@ -136,14 +159,35 @@ public class GameObject extends ShapeDrawable
         this.acceleration.y = y;
     }
 
-    public void registerCallback(GameObjectCollideCallback callback)
+    public void saveCollision(PointF dir)
     {
-        this.callback = callback;
+        collisions.add(dir);
     }
 
-    interface GameObjectCollideCallback
+    public void registerCollisionCallback(GameObjectCollisionCallback callback)
     {
+        this.collisionCallback = callback;
+    }
+
+    /*public void registerInteractionCallback(GameObjectInteractionCallback callback)
+    {
+        this.interactionCallback = callback;
+    }
+
+    public GameObject getParentGameObject()
+    {
+        return this;
+    }*/
+
+    interface GameObjectCollisionCallback
+    {
+
         void triggerVibration();
         void triggerSound();
     }
+
+    /*interface GameObjectInteractionCallback
+    {
+        void triggerRespawn(GameObject gameObject);
+    }*/
 }

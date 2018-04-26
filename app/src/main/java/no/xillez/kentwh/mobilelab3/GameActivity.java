@@ -3,6 +3,7 @@ package no.xillez.kentwh.mobilelab3;
 import android.app.Service;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.PointF;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
@@ -11,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-public class GameActivity extends AppCompatActivity implements GameObject.GameObjectCollideCallback
+public class GameActivity extends AppCompatActivity implements GameObject.GameObjectCollisionCallback
 {
     private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
     private static final String LOG_TAG_WARN = "Xillez_GameActivity [WARN]";
@@ -65,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         // Give sensor and vibrator to Canvas
         Log.i(LOG_TAG_INFO, "Passing on sensor and vibrator to canvas!");
         gameCanvas.setSensor(sensor);
-        gameCanvas.registerCollisionCallback_OnBall(this);
+        gameCanvas.registerCollisionCallback(this);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
     {
         // Vibrator exists? Vibrate!
         if (vibrator != null)
-            vibrator.vibrate(50);
+            vibrator.vibrate(75);
     }
 
     @Override

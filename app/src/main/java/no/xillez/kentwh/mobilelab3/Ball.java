@@ -1,7 +1,6 @@
 package no.xillez.kentwh.mobilelab3;
 
 import android.graphics.PointF;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -17,7 +16,7 @@ public class Ball extends GameObject
 
     // Whether or not collision sound should be played!
     boolean playCollSound = true;
-    CountDownTimer cdt = new CountDownTimer(100, 1) {
+    CountDownTimer cdt = new CountDownTimer(250, 1) {
         @Override
         public void onTick(long millisUntilFinished) {
 
@@ -46,21 +45,40 @@ public class Ball extends GameObject
         // Update color if changed
         this.getPaint().setColor(color);
 
+        // Loop through all ball collisions and add affect
+        for (PointF vec : collisions)
+        {
+            // Update velocity
+            velocity.x += vec.x;
+            velocity.y += vec.y;
+        }
 
+        // We ran through these collisions, clear the list
+        collisions.clear();
 
-        // Get the collision state and bounce if hit
-        CollisionState collState = checkCollisionWithinSquareBounds(gameObject);
+        // Set velocity according to collision state
+        this.setVelocity(((backgroundCollState.left || backgroundCollState.right) ? velocity.x * -1 * 0.50f : velocity.x),
+                ((backgroundCollState.top || backgroundCollState.bottom) ? velocity.y * -1 * 0.50f : velocity.y));
+
+        // Update position with velocity and collision on x-axis and y-axis
+        this.setPosition(new PointF(
+                ((backgroundCollState.left) ? gameObject.getBounds().left + radius :
+                    ((backgroundCollState.right) ? gameObject.getBounds().right - radius :
+                        position.x + velocity.x)),
+                ((backgroundCollState.top) ? gameObject.getBounds().top + radius :
+                    ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - radius :
+                        position.y + velocity.y))));
 
         // Did we collide? if so make GameActivity vibrate phone
-        if (collState.left || collState.right || collState.top || collState.bottom)
+        if (backgroundCollState.left || backgroundCollState.right || backgroundCollState.top || backgroundCollState.bottom)
         {
             // trigger vibration
-            callback.triggerVibration();
+            collisionCallback.triggerVibration();
 
             // If no collision previous update, play sound
             if (playCollSound)
             {
-                callback.triggerSound();
+                collisionCallback.triggerSound();
                 playCollSound = false;
             }
             cdt.cancel();
