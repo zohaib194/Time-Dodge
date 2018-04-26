@@ -14,8 +14,8 @@ import android.util.Log;
 
 public class GameActivity extends AppCompatActivity implements GameObject.GameObjectCollisionCallback
 {
-    private static final String LOG_TAG_INFO = "Xillez_GameActivity [INFO]";
-    private static final String LOG_TAG_WARN = "Xillez_GameActivity [WARN]";
+    private static final String LOG_TAG_INFO = "GameActivity [INFO]";
+    private static final String LOG_TAG_WARN = "GameActivity [WARN]";
 
     private GameCanvas gameCanvas;
 
@@ -90,6 +90,8 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
 
         // Log first drawing even after resume
         if (gameCanvas.isLoggingFirstDrawEvent()) gameCanvas.setLoggingFirstDrawEvent(true);
+
+        gameCanvas.setPrevTime(System.currentTimeMillis());
     }
 
     @Override

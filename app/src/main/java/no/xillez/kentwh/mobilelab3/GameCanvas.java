@@ -20,9 +20,9 @@ import android.view.View;
 public class GameCanvas extends View implements SensorEventListener//, GameObject.GameObjectInteractionCallback
 {
     // Logging variables
-    private static final String LOG_TAG_INFO = "Xillez_CustomCanvas [INFO]";
-    private static final String LOG_TAG_WARN = "Xillez_CustomCanvas [WARN]";
-    private static final String LOG_TAG_ERROR = "Xillez_CustomCanvas [ERROR]";
+    private static final String LOG_TAG_INFO = "CustomCanvas [INFO]";
+    private static final String LOG_TAG_WARN = "CustomCanvas [WARN]";
+    private static final String LOG_TAG_ERROR = "CustomCanvas [ERROR]";
     private boolean logDrawing = true;
 
     // Canvas variables
@@ -180,6 +180,11 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     public void setLoggingFirstDrawEvent(boolean logDrawing)
     {
         this.logDrawing = logDrawing;
+    }
+
+    public void setPrevTime(Long time)
+    {
+        this.prev_time = time;
     }
 
     /*@Override

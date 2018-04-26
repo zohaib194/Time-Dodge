@@ -265,7 +265,7 @@ public class HighscoreFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MenuNavigationFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (HighscoreFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
