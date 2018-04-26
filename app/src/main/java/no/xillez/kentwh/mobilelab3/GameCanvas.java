@@ -17,12 +17,12 @@ import android.view.View;
  * Created by kent on 10.03.18.
  */
 
-public class GameCanvas extends View implements SensorEventListener
+public class GameCanvas extends View implements SensorEventListener//, GameObject.GameObjectInteractionCallback
 {
     // Logging variables
-    private static final String LOG_TAG_INFO = "Xillez_CustomCanvas [INFO]";
-    private static final String LOG_TAG_WARN = "Xillez_CustomCanvas [WARN]";
-    private static final String LOG_TAG_ERROR = "Xillez_CustomCanvas [ERROR]";
+    private static final String LOG_TAG_INFO = "CustomCanvas [INFO]";
+    private static final String LOG_TAG_WARN = "CustomCanvas [WARN]";
+    private static final String LOG_TAG_ERROR = "CustomCanvas [ERROR]";
     private boolean logDrawing = true;
 
     // Canvas variables
@@ -36,19 +36,21 @@ public class GameCanvas extends View implements SensorEventListener
     private Sensor sensor;
 
     // Background variables
-    private ShapeDrawable background;
-    private CollisionBox backCollBox;
+    private GameObject background;
 
-    //Ball variables
+    // Ball
     private Ball ball;
+
+    // Debris
+    private Debris debri;
 
     public GameCanvas(Context context)
     {
         super(context);
-        wSize = new Point();
 
         // Get screen dimensions
         Log.i(LOG_TAG_INFO, "Getting screen size!");
+        wSize = new Point();
         wSize.set(context.getResources().getDisplayMetrics().widthPixels, context.getResources().getDisplayMetrics().heightPixels);
 
         // Setup background
@@ -57,8 +59,11 @@ public class GameCanvas extends View implements SensorEventListener
 
         // Setup ball
         Log.i(LOG_TAG_INFO, "Making the ball!");
-        ball = new Ball();
         makeBall();
+
+        // Setup debris
+        Log.i(LOG_TAG_INFO, "Making the debri!");
+        makeDebris();
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
@@ -79,7 +84,7 @@ public class GameCanvas extends View implements SensorEventListener
             return;
         }
 
-        // Use data from sensor to update velocity
+        // Use data from sensor to update game objects
         ball.setAcceleration(event.values[0], event.values[1]);
 
         // New data is available, current UI/frame is invalid
@@ -100,13 +105,23 @@ public class GameCanvas extends View implements SensorEventListener
         dt = (curr_time - prev_time) / 1000.0f;
         prev_time = curr_time;
 
-        // Is dt a valid value, if so, update ball
+        // Is dt a valid value, if so, update game objects
         if (dt >= 0.0f)
-            ball.update(dt, backCollBox);
+        {
+            // Record all collisions for all game objects
+            ball.checkCollisionWithinSquareBounds(background);
+            ball.checkCollisionWithOutsideRadius(debri);
+            debri.checkCollisionWithinSquareBounds(background);
 
-        // Draw background and ball
+            // Update game objects
+            ball.update(dt, background);
+            debri.update(dt, background);
+        }
+
+        // Draw background, ball and debris
         background.draw(canvas);
         ball.draw(canvas);
+        debri.draw(canvas);
 
         // Disable draw logging after first time
         if (logDrawing)
@@ -122,27 +137,39 @@ public class GameCanvas extends View implements SensorEventListener
     private void makeBackground()
     {
         // Make new rectangle shape, set it's color, position and collision box
-        background = new ShapeDrawable(new RectShape());
+        background = new GameObject(new RectShape());
         background.getPaint().setColor(Color.DKGRAY);
         background.setBounds(MARGIN, MARGIN, wSize.x - MARGIN, wSize.y - MARGIN);
-        backCollBox = new CollisionBox(MARGIN, MARGIN, wSize.y - MARGIN, wSize.x - MARGIN);
     }
 
     private void makeBall()
     {
         // Set ball's color, position, velocity, radius and collision box
-        ball.setDiameter(50);
-        ball.setPosition(new PointF(wSize.x / 2 - ball.getDiameter() / 2, wSize.y / 2 - ball.getDiameter() / 2));
+        ball = new Ball();
+        ball.setRadius(25);
+        ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
-        ball.updateCollBox();
+        //ball.registerInteractionCallback(this);
     }
 
-    public void registerCollisionCallback_OnBall(GameActivity gameActivity)
+    private void makeDebris()
     {
-        // Relay the registration of collision callback to the ball, if it exists
+        // Set ball's color, position, velocity, radius and collision box
+        debri = new Debris();
+        debri.setRadius(25);
+        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2)),
+                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2))));
+        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
+        debri.setColor(Color.BLUE);
+    }
+
+    public void registerCollisionCallback(GameObject.GameObjectCollisionCallback gameActivity)
+    {
+        // Relay the registration of collision collisionCallback to the ball, if it exists
         if (ball != null)
-            ball.registerCallback(gameActivity);
+            ball.registerCollisionCallback(gameActivity);
     }
 
     public boolean isLoggingFirstDrawEvent()
@@ -154,4 +181,18 @@ public class GameCanvas extends View implements SensorEventListener
     {
         this.logDrawing = logDrawing;
     }
+
+    public void setPrevTime(Long time)
+    {
+        this.prev_time = time;
+    }
+
+    /*@Override
+    public void triggerRespawn(GameObject gameObject)
+    {
+        gameObject.respawn(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4)),
+                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4))),
+        new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
+    }*/
 }
