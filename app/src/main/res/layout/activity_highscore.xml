@@ -7,7 +7,7 @@
     tools:context=".HighscoreActivity">
 
     <fragment
-        android:id="@+id/navigation"
+        android:id="@+id/highscore"
         android:name="no.xillez.kentwh.mobilelab3.HighscoreFragment"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

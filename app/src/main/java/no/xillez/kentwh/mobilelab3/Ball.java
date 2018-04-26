@@ -57,6 +57,7 @@ public class Ball extends ShapeDrawable
             // trigger vibration
             callback.triggerVibration();
 
+            callback.triggerGameOver();
 
             // If no collision previous update, play sound
             if (!prevCollState) callback.triggerSound();
@@ -186,6 +187,7 @@ public class Ball extends ShapeDrawable
 
     interface BallCollideCallback
     {
+        void triggerGameOver();
         void triggerVibration();
         void triggerSound();
     }

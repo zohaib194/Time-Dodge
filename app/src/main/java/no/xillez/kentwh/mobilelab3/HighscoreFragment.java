@@ -92,7 +92,6 @@ public class HighscoreFragment extends Fragment{
 
         onDBUpdate();
 
-        // TODO : Sorting the arrays
         // Top 5 button on click listener
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,8 +114,6 @@ public class HighscoreFragment extends Fragment{
                 }
             }
         });
-
-        // TODO : fix button 2 and 3 to show correct amount of items.
 
         // Top 10 button on click listener
         button2.setOnClickListener(new View.OnClickListener(){
@@ -156,19 +153,6 @@ public class HighscoreFragment extends Fragment{
             }
         });
         return view;
-    }
-
-    public void debugfunction(){
-        scoreList.clear();
-        for(long i = 0; i < 20; i++){
-            scoreList.add(i);
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("u", "zohaib" + i);
-            map.put("s", i);
-            root.child("score").push().updateChildren(map);
-        }
-        adapter.notifyDataSetChanged();
     }
 
     private void onDBUpdate(){

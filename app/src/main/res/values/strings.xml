@@ -6,4 +6,11 @@
     <string name="btnSetting">Settings</string>
     <string name="btnHighScore">High score</string>
     <string name="highscore">Highscore</string>
+    <string name="gameover">GAME OVER</string>
+    <string name="preference_bestscore">best_score</string>
+    <string name="preference_currentscore">current_score</string>
+    <string name="preference_file_key">preferences</string>
+    <string name="preference_bonus">bonus</string>
+    <string name="preference_item">items</string>
+
 </resources>
