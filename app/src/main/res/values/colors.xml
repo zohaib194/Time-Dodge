@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorTrans">#00000000</color>
-    <color name="overlay_background">#64000000</color>
 
+    <color name="colorPrimary">#ccbd8f</color>
+    <color name="colorPrimaryDark">#93492d</color>
+    <color name="colorAccent">#f58025</color>
+    <color name="foreground_material_light">#f1d282</color>
+    <color name="colorBackground">#dde7ee</color>
+    <color name="colorBackgroundTransp">#c2131313</color>
 </resources>

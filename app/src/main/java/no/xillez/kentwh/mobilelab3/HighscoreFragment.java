@@ -63,10 +63,10 @@ public class HighscoreFragment extends Fragment{
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
         // UI setup.
-        this.highscoreListView = view.findViewById(R.id.LW1);
-        this.button1 = view.findViewById(R.id.B1);
-        this.button2 = view.findViewById(R.id.B2);
-        this.button3 = view.findViewById(R.id.B3);
+        this.highscoreListView = view.findViewById(R.id.frag_highscore_listview01);
+        this.button1 = view.findViewById(R.id.frag_highscore_button01);
+        this.button2 = view.findViewById(R.id.frag_highscore_button02);
+        this.button3 = view.findViewById(R.id.frag_highscore_button03);
 
         // Array lists and setup array list adapter
         this.scoreList = new ArrayList<>();
@@ -252,7 +252,7 @@ public class HighscoreFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MenuNavigationFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (HighscoreFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
