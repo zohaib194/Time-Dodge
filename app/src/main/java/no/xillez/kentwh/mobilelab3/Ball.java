@@ -16,7 +16,7 @@ public class Ball extends GameObject
 
     // Whether or not collision sound should be played!
     boolean playCollSound = true;
-    CountDownTimer cdt = new CountDownTimer(250, 1) {
+    CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
         @Override
         public void onTick(long millisUntilFinished) {
 
@@ -36,6 +36,7 @@ public class Ball extends GameObject
         super(new OvalShape());
     }
 
+    @Override
     public void update(float dt, GameObject gameObject)
     {
         // Find new velocity based on acceleration (in landscape mode, x and y is swapped)
@@ -83,8 +84,8 @@ public class Ball extends GameObject
                 collisionCallback.triggerSound();
                 playCollSound = false;
             }
-            cdt.cancel();
-            cdt.start();
+            playCollSoundTimer.cancel();
+            playCollSoundTimer.start();
         }
 
         // Update position and collision box

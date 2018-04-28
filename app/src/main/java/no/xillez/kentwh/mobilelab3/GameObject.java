@@ -41,7 +41,38 @@ public class GameObject extends ShapeDrawable
         super(shape);
     }
 
-    public void update(float dt, GameObject gameObject) {}
+    public void update(float dt, GameObject gameObject)
+    {
+        // Find new velocity based on acceleration (in landscape mode, x and y is swapped)
+        velocity.x += acceleration.y * 4.0f * dt;
+        velocity.y += acceleration.x * 4.0f * dt;
+
+        // Loop through all ball collisions and add affect
+        for (PointF vec : collisions)
+        {
+            // Update velocity
+            velocity.x += vec.x;
+            velocity.y += vec.y;
+        }
+
+        // We ran through these collisions, clear the list
+        collisions.clear();
+
+        float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
+
+        // Set velocity according to collision state
+        this.setVelocity(((backgroundCollState.left || backgroundCollState.right) ? velocity.x * -1 * 0.50f : velocity.x),
+                ((backgroundCollState.top || backgroundCollState.bottom) ? velocity.y * -1 * 0.50f : velocity.y));
+
+        // Update position with velocity and collision on x-axis and y-axis
+        this.setPosition(new PointF(
+                ((backgroundCollState.left) ? gameObject.getBounds().left + size :
+                        ((backgroundCollState.right) ? gameObject.getBounds().right - size :
+                                position.x + velocity.x)),
+                ((backgroundCollState.top) ? gameObject.getBounds().top + size :
+                        ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - size :
+                                position.y + velocity.y))));
+    }
 
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
     {
