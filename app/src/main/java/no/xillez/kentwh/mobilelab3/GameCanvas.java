@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import java.util.ArrayList;
+
 /**
  * Created by kent on 10.03.18.
  */
@@ -32,6 +34,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     private float dt = -1.0f;
     private Long curr_time;
     private Long prev_time;
+    private float spawnTime = 0.0f;
+    private float addativeGameTime = 0.0f;
 
     // Sensors
     private Sensor sensor;
@@ -42,9 +46,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     // Ball
     private Ball ball;
 
-
     // Debris
-    private Debris debri;
+    private ArrayList<Debris> debris = new ArrayList<>();
 
     public GameCanvas(Context context, AttributeSet attr)
     {
@@ -62,10 +65,6 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         // Setup ball
         Log.i(LOG_TAG_INFO, "Making the ball!");
         makeBall();
-
-        // Setup debris
-        Log.i(LOG_TAG_INFO, "Making the debri!");
-        makeDebris();
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
@@ -107,23 +106,39 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         dt = (curr_time - prev_time) / 1000.0f;
         prev_time = curr_time;
 
-        // Is dt a valid value, if so, update game objects
-        if (dt >= 0.0f)
-        {
-            // Record all collisions for all game objects
-            ball.checkCollisionWithinSquareBounds(background);
-            ball.checkCollisionWithOutsideRadius(debri);
-            debri.checkCollisionWithinSquareBounds(background);
+        addativeGameTime += dt * 0.5f;
+        spawnTime += addativeGameTime * 0.5f;
 
-            // Update game objects
-            ball.update(dt, background);
-            debri.update(dt, background);
+        if (spawnTime > 100 && debris.size() < 50)
+        {
+            makeDebris();
+            spawnTime = 0;
         }
+
+        // Record all collisions for all game objects
+        ball.checkCollisionWithinSquareBounds(background);
+
+        for (Debris go : debris)
+        {
+            ball.checkCollisionWithOutsideRadius(go);
+            for (Debris go2 : debris)
+                if(go != go2) {
+                    go.checkCollisionWithOutsideRadius(go2);
+                }
+            go.checkCollisionWithinSquareBounds(background);
+        }
+
+        // Update game objects
+        ball.update(dt, background);
+
+        for (Debris go : debris)
+            go.update(dt, background);
 
         // Draw background, ball and debris
         background.draw(canvas);
         ball.draw(canvas);
-        debri.draw(canvas);
+        for (Debris go : debris)
+            go.draw(canvas);
 
         // Disable draw logging after first time
         if (logDrawing)
@@ -158,13 +173,14 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     private void makeDebris()
     {
         // Set ball's color, position, velocity, radius and collision box
-        debri = new Debris();
+        Debris debri = new Debris();
         debri.setRadius(25);
-        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2)),
-                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 2))));
-        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
-                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
+        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f)),
+                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f))));
+        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.01f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.01f));
         debri.setColor(Color.BLUE);
+        debris.add(debri);
     }
 
     public void registerCollisionCallback(GameObject.GameObjectCollisionCallback gameActivity)
