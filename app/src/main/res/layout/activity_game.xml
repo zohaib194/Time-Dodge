@@ -6,31 +6,41 @@
     android:layout_height="match_parent"
     tools:context="no.xillez.kentwh.mobilelab3.GameActivity">
 
-    <TextView
-        android:id="@+id/game_textview01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/game_textview02"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.946" />
 
-    <TextView
-        android:id="@+id/game_textview02"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="216dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <RelativeLayout
+        android:id="@+id/fragmentContainer01"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent">
+
+        <no.xillez.kentwh.mobilelab3.GameCanvas
+            android:id="@+id/game_gamecanvas01"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/game_framelayout01"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:background= "@color/colorBackgroundTransp">
+
+            <fragment
+                android:id="@+id/game_gameover01"
+                android:name="no.xillez.kentwh.mobilelab3.GameOverFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

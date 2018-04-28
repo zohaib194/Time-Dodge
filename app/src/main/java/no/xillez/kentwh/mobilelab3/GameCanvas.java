@@ -10,6 +10,7 @@ import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
@@ -41,12 +42,13 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     // Ball
     private Ball ball;
 
+
     // Debris
     private Debris debri;
 
-    public GameCanvas(Context context)
+    public GameCanvas(Context context, AttributeSet attr)
     {
-        super(context);
+        super(context, attr);
 
         // Get screen dimensions
         Log.i(LOG_TAG_INFO, "Getting screen size!");
