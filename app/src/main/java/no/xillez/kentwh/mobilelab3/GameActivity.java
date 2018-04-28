@@ -86,7 +86,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
 
         // Re-register sensor listener
         Log.i(LOG_TAG_INFO, "App un-paused, registering sensor listener");
-        sensorManager.registerListener(gameCanvas, sensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(gameCanvas, sensor, SensorManager.SENSOR_DELAY_FASTEST);
 
         // Log first drawing even after resume
         if (gameCanvas.isLoggingFirstDrawEvent()) gameCanvas.setLoggingFirstDrawEvent(true);

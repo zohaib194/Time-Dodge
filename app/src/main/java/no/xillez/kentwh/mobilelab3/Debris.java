@@ -11,13 +11,13 @@ public class Debris extends GameObject
 {
     protected int radius = 0;
     protected int color = 0;
-    //protected boolean respawnTimerStarted = false;
 
     Debris()
     {
         super(new OvalShape());
     }
 
+    @Override
     public void update(float dt, GameObject gameObject)
     {
         // Find new velocity based on acceleration (in landscape mode x and y is switched)
@@ -38,8 +38,8 @@ public class Debris extends GameObject
         for (PointF vec : collisions)
         {
             // Update velocity
-            velocity.x += vec.x;
-            velocity.y += vec.y;
+            velocity.x = (velocity.x * 0.5f) + vec.x;
+            velocity.y = (velocity.y * 0.5f) + vec.y;
         }
 
         // We ran through these collisions, clear the list
