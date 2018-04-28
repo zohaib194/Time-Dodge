@@ -181,7 +181,7 @@ public class GameObject extends ShapeDrawable
 
     interface GameObjectCollisionCallback
     {
-
+        void triggerGameOver();
         void triggerVibration();
         void triggerSound();
     }

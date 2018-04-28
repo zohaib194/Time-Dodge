@@ -75,6 +75,8 @@ public class Ball extends GameObject
             // trigger vibration
             collisionCallback.triggerVibration();
 
+            collisionCallback.triggerGameOver();
+
             // If no collision previous update, play sound
             if (playCollSound)
             {
@@ -113,4 +115,5 @@ public class Ball extends GameObject
     {
         this.vibrator = vibrator;
     }
+
 }
