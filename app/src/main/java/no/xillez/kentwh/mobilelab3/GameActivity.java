@@ -115,6 +115,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         if(gameOver == true) {
             return;
         }
+
         gameOver = true;
 
         FrameLayout frameLayout = findViewById(R.id.game_framelayout01);

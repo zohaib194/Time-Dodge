@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -113,7 +112,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         addativeGameTime += dt * 0.5f;
         spawnTime += addativeGameTime * 0.5f;
 
-        if (spawnTime > 100 && debris.size() < 50)
+        if (spawnTime > 100 && debris.size() < 10)
         {
             makeDebris();
             spawnTime = 0;
@@ -124,6 +123,14 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
 
         for (Debris go : debris)
         {
+            if (go.isOutside())
+            {
+                go.setPosition((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
+                        (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)));
+                go.setVelocity((ball.getPosition().x - go.getPosition().x) * 0.025f,
+                        (ball.getPosition().y - go.getPosition().y) * 0.025f);
+            }
+
             ball.checkCollisionWithOutsideRadius(go);
             for (Debris go2 : debris)
                 if(go != go2) {
@@ -172,7 +179,6 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
-        //ball.registerInteractionCallback(this);
     }
 
     private void makeDebris()
@@ -180,8 +186,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         // Set ball's color, position, velocity, radius and collision box
         Debris debri = new Debris();
         debri.setRadius(25);
-        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f)),
-                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f))));
+        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
+                (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f))));
         debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.025f,
                 (ball.getPosition().y - debri.getPosition().y) * 0.025f));
         debri.setColor(Color.BLUE);

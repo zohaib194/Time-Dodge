@@ -12,6 +12,9 @@ public class Debris extends GameObject
     protected int radius = 0;
     protected int color = 0;
 
+    boolean isOutside = false;
+    boolean hasBeenInside = false;
+
     Debris()
     {
         super(new OvalShape());
@@ -38,18 +41,19 @@ public class Debris extends GameObject
         for (PointF vec : collisions)
         {
             // Update velocity
-            velocity.x = (velocity.x * 0.5f) + vec.x;
-            velocity.y = (velocity.y * 0.5f) + vec.y;
+            velocity.x = (velocity.x * 0.75f) + vec.x;
+            velocity.y = (velocity.y * 0.75f) + vec.y;
         }
 
         // We ran through these collisions, clear the list
         collisions.clear();
 
-        // If debris hit window edge, respawn after 1 sec
-        /*if (!respawnTimerStarted && (backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom)) {
-            this.respawnCountDownTimer.start();
-            respawnTimerStarted = true;
-        }*/
+        // Have I been inside before and am I inside now (not past the edge of the screen).
+        if (!hasBeenInside && !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom))
+            hasBeenInside = !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom);
+
+        // have I been inside yet and am I collision now (past the edge of the screen)
+        isOutside = (hasBeenInside && (backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom));
 
         // Update position with new velocity
         position.x += velocity.x;
@@ -57,6 +61,23 @@ public class Debris extends GameObject
 
         // Update position and collision box
         this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
+    }
+
+    @Override
+    protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
+    {
+        // Save background collision state for later updating
+        backgroundCollState = new CollisionState(
+                // Going left        Ball passed background's left?
+                (velocity.x < 0 && this.getBounds().right < gameObject.getBounds().left),
+                // Going up          Ball passed background's top?
+                (velocity.y < 0 && this.getBounds().bottom < gameObject.getBounds().top),
+                // Going down        Ball passed background's down?
+                (velocity.y > 0 && this.getBounds().top > gameObject.getBounds().bottom),
+                // Going right       Ball passed background's right?
+                (velocity.x > 0 && this.getBounds().left > gameObject.getBounds().right));
+
+        return backgroundCollState;
     }
 
     public int getColor()
@@ -77,5 +98,15 @@ public class Debris extends GameObject
     public void setRadius(int radius)
     {
         this.radius = radius;
+    }
+
+    public boolean isOutside()
+    {
+        return isOutside;
+    }
+
+    public void setOutside(boolean outside)
+    {
+        isOutside = outside;
     }
 }
