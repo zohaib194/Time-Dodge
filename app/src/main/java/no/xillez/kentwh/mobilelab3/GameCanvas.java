@@ -67,7 +67,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
 
         // Make a debris at first to keep player active in the beginning
         Log.i(LOG_TAG_INFO, "Making a debris to keep player active!");
-        makeBall();
+        makeDebris();
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
