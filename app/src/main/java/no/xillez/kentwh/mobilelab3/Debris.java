@@ -21,8 +21,8 @@ public class Debris extends GameObject
     public void update(float dt, GameObject gameObject)
     {
         // Find new velocity based on acceleration (in landscape mode x and y is switched)
-        velocity.x += acceleration.y * 4.0f * dt;
-        velocity.y += acceleration.x * 4.0f * dt;
+        velocity.x += acceleration.y * dt;
+        velocity.y += acceleration.x * dt;
 
         // Update color if changed
         this.getPaint().setColor(color);

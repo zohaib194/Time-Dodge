@@ -66,6 +66,10 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         Log.i(LOG_TAG_INFO, "Making the ball!");
         makeBall();
 
+        // Make a debris at first to keep player active in the beginning
+        Log.i(LOG_TAG_INFO, "Making a debris to keep player active!");
+        makeBall();
+
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
     }
@@ -86,7 +90,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         }
 
         // Use data from sensor to update game objects
-        ball.setAcceleration(event.values[0], event.values[1]);
+        ball.setAcceleration(event.values[0] * 3.0f, event.values[1] * 3.0f);
 
         // New data is available, current UI/frame is invalid
         invalidate();
@@ -128,9 +132,10 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
             go.checkCollisionWithinSquareBounds(background);
         }
 
-        // Update game objects
+        // Update ball
         ball.update(dt, background);
 
+        // Update all debris
         for (Debris go : debris)
             go.update(dt, background);
 
@@ -177,8 +182,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         debri.setRadius(25);
         debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f)),
                 (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 1.5f))));
-        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.01f,
-                (ball.getPosition().y - debri.getPosition().y) * 0.01f));
+        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.025f,
+                (ball.getPosition().y - debri.getPosition().y) * 0.025f));
         debri.setColor(Color.BLUE);
         debris.add(debri);
     }
