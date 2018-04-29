@@ -191,7 +191,7 @@ public class GameOverFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MenuNavigationFragment.OnFragmentInteractionListener) {
+        if (context instanceof GameOverFragment.OnFragmentInteractionListener) {
             mListener = (GameOverFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
