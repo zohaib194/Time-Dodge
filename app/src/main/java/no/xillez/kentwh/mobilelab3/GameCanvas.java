@@ -34,7 +34,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     private Long curr_time;
     private Long prev_time;
     private float spawnTime = 0.0f;
-    private float addativeGameTime = 0.0f;
+    private float additiveGameTime = 0.0f;
 
     // Sensors
     private Sensor sensor;
@@ -109,8 +109,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         dt = (curr_time - prev_time) / 1000.0f;
         prev_time = curr_time;
 
-        addativeGameTime += dt * 0.5f;
-        spawnTime += addativeGameTime * 0.5f;
+        additiveGameTime += dt * 0.5f;
+        spawnTime += additiveGameTime * 0.5f;
 
         if (spawnTime > 100 && debris.size() < 10)
         {
