@@ -82,9 +82,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         if (account == null) {
             // Enable the button.
             signInButton.setEnabled(true);
-            Log.i("test", "is account null: " + (account == null));
         } else if (account.getDisplayName() != null){
-            Log.i("test", "is account null: " + (account == null) + " | Is name null: " + (account.getDisplayName() == null) + " | Name: " + account.getDisplayName());
 
             // Disable the button.
             signInButton.setEnabled(false);
@@ -106,7 +104,6 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     public void actionStartGame(View view){
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra(getString(R.string.preference_username), userName);
-        Log.i("test", "UserName from menu: " + userName);
         startActivity(intent);
     }
 

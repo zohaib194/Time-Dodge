@@ -195,7 +195,6 @@ public class GameOverFragment extends Fragment{
 
     private void saveScoreToFirebase(){
         if(userName != null && total > bestScore) {
-            Log.i("test", "passed save to firebase!");
             Map<String, Object> map = new HashMap<>();
             map.put("s", total);
             map.put("u", userName);
@@ -209,13 +208,8 @@ public class GameOverFragment extends Fragment{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot entry : dataSnapshot.getChildren()) {
-                    Log.i("test", "passed delete from firebase outside!");
                     if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
-                        Log.i("test", "passed delete from first if!");
-                        Log.i("test","dbScore: " + entry.child("s").getValue() + ", newScore: " + total + ", userfromDB: " + entry.child("u").getValue() + ", userFromPref: " + userName);
-                        Log.i("test", "trueorfalse: " + ((long) entry.child("s").getValue() < total));
                         if(((long) entry.child("s").getValue()) < total && entry.child("u").getValue().equals(userName)) {
-                            Log.i("test", "passed delete from second if!");
                             entry.getRef().setValue(null);
                         }
                     }
@@ -277,7 +271,6 @@ public class GameOverFragment extends Fragment{
 
     public void setUserName(String userName) {
         this.userName = userName;
-        Log.i("test", "setUserName: " + this.userName);
     }
 
 }
