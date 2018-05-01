@@ -13,8 +13,10 @@
     <string name="preference_file_key">preferences</string>
     <string name="preference_bonus">bonus</string>
     <string name="preference_item">items</string>
+    <string name="preference_username">username</string>
 
     <string name="top5">Top 5</string>
     <string name="top10">Top 10</string>
     <string name="overall">Overall</string>
+    <string name="signin_other_error">Error occured!</string>
 </resources>

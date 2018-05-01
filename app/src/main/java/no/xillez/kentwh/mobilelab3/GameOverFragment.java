@@ -23,13 +23,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameOverFragment extends Fragment{
 
     private OnFragmentInteractionListener mListener;
     private SharedPreferences sharedPreferences;
     private CountDownTimer countDownTimer[];
     private boolean isAnimateDone = false;
+    private DatabaseReference root;
+    private ValueEventListener valueEventListener;
 
+    private String userName;
     private Long score;
     private Long newScore;
     private Long item;
@@ -53,11 +66,13 @@ public class GameOverFragment extends Fragment{
         this.sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         // Get the data from shared preferences.
-        this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 100L);
-        this.newScore = this.sharedPreferences.getLong(getString(R.string.preference_currentscore), 100L);
+        this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 101L);
+        this.newScore = this.sharedPreferences.getLong(getString(R.string.preference_currentscore), 102L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 10L);
         this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 5L);
+        this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
         this.total = (long)(newScore + (item * 0.5) + (bonus * 0.2));
+        this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
     }
 
@@ -116,6 +131,10 @@ public class GameOverFragment extends Fragment{
         animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "0.2", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
         animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
+
+        removeCurrentScoreFromHighscore();
+        root.child("score").removeEventListener(valueEventListener);
+        saveScoreToFirebase();
     }
 
     /**
@@ -171,6 +190,96 @@ public class GameOverFragment extends Fragment{
                 }
             }
         }.start();
+    }
+
+    private void saveScoreToFirebase(){
+        if(userName != null && total > score) {
+            Log.i("test", "passed save to firebase!");
+            Map<String, Object> map = new HashMap<>();
+            map.put("s", total);
+            map.put("u", userName);
+            root.child("score").push().updateChildren(map);
+        }
+    }
+
+
+    private void removeCurrentScoreFromHighscore(){
+        valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot entry : dataSnapshot.getChildren()) {
+                    Log.i("test", "passed delete from firebase outside!");
+                    if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
+                        Log.i("test", "passed delete from first if!");
+                        if(((long) entry.child("s").getValue()) == score && entry.child("u").getValue() == userName) {
+                            Log.i("test", "passed delete from firebase!");
+                            dataSnapshot.getRef().setValue(null);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+
+        root.child("score").addListenerForSingleValueEvent(valueEventListener);
+
+//        root.child("score").removeEventListener(valueEventListener);
+
+     /*
+                addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot entry : dataSnapshot.getChildren()) {
+                    Log.i("test", "passed delete from firebase outside!");
+                    if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
+                        Log.i("test", "passed delete from first if!");
+                        if(((long) entry.child("s").getValue()) <= total && entry.child("u").getValue() == userName) {
+                            Log.i("test", "passed delete from firebase!");
+                            dataSnapshot.getRef().setValue(null);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+*/
+/*
+
+
+                .addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
     }
 
     /**
