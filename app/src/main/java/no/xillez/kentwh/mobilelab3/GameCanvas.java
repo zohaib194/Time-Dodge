@@ -147,8 +147,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
                 //Calculate the unit vector (of length 1) in direction of the ball
                 final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - go.getPosition().x,ball.getPosition().y - go.getPosition().y);
                 final PointF normalizedVector = new PointF(
-                        unNormalizedVelocity.x /(unNormalizedVelocity.x + unNormalizedVelocity.y),
-                        unNormalizedVelocity.y /(unNormalizedVelocity.x + unNormalizedVelocity.y)
+                        unNormalizedVelocity.x /(Math.abs(unNormalizedVelocity.x) + Math.abs(unNormalizedVelocity.y)),
+                        unNormalizedVelocity.y /(Math.abs(unNormalizedVelocity.x) + Math.abs(unNormalizedVelocity.y))
                 );
 
                 // Set position based on unit vector and ball movement.
