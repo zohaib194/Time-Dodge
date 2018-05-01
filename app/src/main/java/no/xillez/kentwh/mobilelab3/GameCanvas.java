@@ -48,7 +48,6 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         {
             points++;
             Log.i("PointsTest", "" + points);
-            this.cancel();
             this.start();
         }
     };
