@@ -24,18 +24,6 @@ public class GameObject extends ShapeDrawable
     protected ArrayList<PointF> collisions = new ArrayList<>();
     protected CollisionState backgroundCollState = new CollisionState(false, false, false, false);
 
-    /*CountDownTimer respawnCountDownTimer = new CountDownTimer(1000, 1) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-
-        }
-
-        @Override
-        public void onFinish() {
-            callbackRespawn();
-        }
-    };*/
-
     GameObject(Shape shape)
     {
         super(shape);
@@ -58,6 +46,7 @@ public class GameObject extends ShapeDrawable
         // We ran through these collisions, clear the list
         collisions.clear();
 
+        // Find the radius of the object
         float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
 
         // Set velocity according to collision state
@@ -119,23 +108,7 @@ public class GameObject extends ShapeDrawable
         return (diff <= 0);
     }
 
-    /*public void callbackRespawn()
-    {
-        interactionCallback.triggerRespawn(getParentGameObject());
-    }
-
-    public void respawn(PointF pos, PointF vel)
-    {
-        this.setPosition(pos);
-        this.setVelocity(vel);
-    }*/
-
-    /*protected float dot(PointF vec1, PointF vec2)
-    {
-        return ((vec1.x * vec2.x) + (vec1.y * vec2.y));
-    }
-
-    protected PointF norm(PointF vec)
+    /*protected PointF norm(PointF vec)
     {
         float length = (float) Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
         return new PointF(vec.x / length, vec.y / length);
@@ -151,7 +124,6 @@ public class GameObject extends ShapeDrawable
         this.position = position;
     }
 
-    @Deprecated
     public void setPosition(float x, float y)
     {
         this.position.x = x;
@@ -200,25 +172,10 @@ public class GameObject extends ShapeDrawable
         this.collisionCallback = callback;
     }
 
-    /*public void registerInteractionCallback(GameObjectInteractionCallback callback)
-    {
-        this.interactionCallback = callback;
-    }
-
-    public GameObject getParentGameObject()
-    {
-        return this;
-    }*/
-
     interface GameObjectCollisionCallback
     {
         void triggerGameOver();
         void triggerVibration();
         void triggerSound();
     }
-
-    /*interface GameObjectInteractionCallback
-    {
-        void triggerRespawn(GameObject gameObject);
-    }*/
 }
