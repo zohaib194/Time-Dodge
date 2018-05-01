@@ -6,5 +6,9 @@
     <color name="colorAccent">#f58025</color>
     <color name="foreground_material_light">#f1d282</color>
     <color name="colorBackground">#dde7ee</color>
+
+
+    <color name="GREEN">#00ff00</color>
     <color name="colorBackgroundTransp">#c2131313</color>
+
 </resources>
