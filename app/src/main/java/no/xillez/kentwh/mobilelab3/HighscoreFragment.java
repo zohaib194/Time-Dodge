@@ -155,19 +155,6 @@ public class HighscoreFragment extends Fragment{
         return view;
     }
 
-    public void debugfunction(){
-        scoreList.clear();
-        for(long i = 0; i < 20; i++){
-            scoreList.add(i);
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("u", "zohaib" + i);
-            map.put("s", i);
-            root.child("score").push().updateChildren(map);
-        }
-        adapter.notifyDataSetChanged();
-    }
-
     private void onDBUpdate(){
         root.child("score").addChildEventListener(new ChildEventListener() {
             @Override
@@ -265,7 +252,7 @@ public class HighscoreFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MenuNavigationFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (HighscoreFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
