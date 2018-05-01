@@ -32,10 +32,12 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     private Point wSize;
     private int MARGIN = 5;
     private float dt = -1.0f;
+    private float dt_altered = -1.0f;
     private Long curr_time;
     private Long prev_time;
     private float spawnTime = 0.0f;
     private float additiveGameTime = 0.0f;
+
 
     private Long points = 0L;
     private CountDownTimer pointGiver = new CountDownTimer(2000, 1)
@@ -109,18 +111,12 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         // Use data from sensor to update game objects
         ball.setAcceleration(event.values[0] * 3.0f, event.values[1] * 3.0f);
 
-        // New data is available, current UI/frame is invalid
-        invalidate();
+        //Update things indirectly affected by sensor change.
+        update();
+
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
-    @Override
-    protected void onDraw(Canvas canvas)
-    {
-        if (logDrawing)
-            Log.i(LOG_TAG_INFO, "Updating and drawing the background and ball on canvas!");
+    private void update() {
 
         // Get time since last frame
         curr_time = System.currentTimeMillis();
@@ -129,6 +125,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
 
         additiveGameTime += dt * 0.5f;
         spawnTime += additiveGameTime * 0.5f;
+
+        dt_altered = dt * (float)Math.sqrt(Math.pow(ball.velocity.x, 2.0f) + Math.pow(ball.velocity.y, 2.0f));
 
         if (spawnTime > 100 && debris.size() < 10)
         {
@@ -145,8 +143,19 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
             {
                 go.setPosition((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
                         (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)));
-                go.setVelocity((ball.getPosition().x - go.getPosition().x) * 0.025f,
-                        (ball.getPosition().y - go.getPosition().y) * 0.025f);
+
+                //Calculate the unit vector (of length 1) in direction of the ball
+                final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - go.getPosition().x,ball.getPosition().y - go.getPosition().y);
+                final PointF normalizedVector = new PointF(
+                        unNormalizedVelocity.x /(unNormalizedVelocity.x + unNormalizedVelocity.y),
+                        unNormalizedVelocity.y /(unNormalizedVelocity.x + unNormalizedVelocity.y)
+                );
+
+                // Set position based on unit vector and ball movement.
+                go.setVelocity(
+                        normalizedVector.x * dt_altered,
+                        normalizedVector.x * dt_altered
+                );
             }
 
             ball.checkCollisionWithOutsideRadius(go);
@@ -162,7 +171,20 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
 
         // Update all debris
         for (Debris go : debris)
-            go.update(dt, background);
+            go.update(dt_altered, background);
+
+        // New data is available, current UI/frame is invalid.
+        invalidate();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    @Override
+    protected void onDraw(Canvas canvas)
+    {
+        if (logDrawing)
+            Log.i(LOG_TAG_INFO, "Updating and drawing the background and ball on canvas!");
 
         // Draw background, ball and debris
         background.draw(canvas);
