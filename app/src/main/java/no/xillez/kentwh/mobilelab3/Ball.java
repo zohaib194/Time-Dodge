@@ -16,7 +16,7 @@ public class Ball extends GameObject
 
     // Whether or not collision sound should be played!
     boolean playCollSound = true;
-    CountDownTimer cdt = new CountDownTimer(250, 1) {
+    CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
         @Override
         public void onTick(long millisUntilFinished) {
 
@@ -36,11 +36,12 @@ public class Ball extends GameObject
         super(new OvalShape());
     }
 
-    public void update(float dt, GameObject gameObject)
+    @Override
+    public void update(float dt, GameObject background)
     {
         // Find new velocity based on acceleration (in landscape mode, x and y is swapped)
-        velocity.x += acceleration.y * 4.0f * dt;
-        velocity.y += acceleration.x * 4.0f * dt;
+        velocity.x += (acceleration.y * dt);
+        velocity.y += (acceleration.x * dt);
 
         // Update color if changed
         this.getPaint().setColor(color);
@@ -62,11 +63,11 @@ public class Ball extends GameObject
 
         // Update position with velocity and collision on x-axis and y-axis
         this.setPosition(new PointF(
-                ((backgroundCollState.left) ? gameObject.getBounds().left + radius :
-                    ((backgroundCollState.right) ? gameObject.getBounds().right - radius :
+                ((backgroundCollState.left) ? background.getBounds().left + radius :
+                    ((backgroundCollState.right) ? background.getBounds().right - radius :
                         position.x + velocity.x)),
-                ((backgroundCollState.top) ? gameObject.getBounds().top + radius :
-                    ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - radius :
+                ((backgroundCollState.top) ? background.getBounds().top + radius :
+                    ((backgroundCollState.bottom) ? background.getBounds().bottom - radius :
                         position.y + velocity.y))));
 
         // Did we collide? if so make GameActivity vibrate phone
@@ -75,6 +76,7 @@ public class Ball extends GameObject
             // trigger vibration
             collisionCallback.triggerVibration();
 
+            // Trigger gameover
             collisionCallback.triggerGameOver();
 
             // If no collision previous update, play sound
@@ -83,8 +85,8 @@ public class Ball extends GameObject
                 collisionCallback.triggerSound();
                 playCollSound = false;
             }
-            cdt.cancel();
-            cdt.start();
+            playCollSoundTimer.cancel();
+            playCollSoundTimer.start();
         }
 
         // Update position and collision box

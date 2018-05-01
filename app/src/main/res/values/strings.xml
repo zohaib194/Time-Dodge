@@ -19,4 +19,5 @@
     <string name="top10">Top 10</string>
     <string name="overall">Overall</string>
     <string name="signin_other_error">Error occured!</string>
+    <string name="ball_description">ball as part of logo</string>
 </resources>

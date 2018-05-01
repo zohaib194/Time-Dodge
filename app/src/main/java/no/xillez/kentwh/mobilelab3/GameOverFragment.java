@@ -1,17 +1,12 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +16,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,7 +37,7 @@ public class GameOverFragment extends Fragment{
 
     private String userName;
     private Long score;
-    private Long newScore;
+    private Long newScore = 0L;
     private Long item;
     private Long bonus;
     private Long total;
@@ -67,7 +60,6 @@ public class GameOverFragment extends Fragment{
 
         // Get the data from shared preferences.
         this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 101L);
-        this.newScore = this.sharedPreferences.getLong(getString(R.string.preference_currentscore), 102L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 10L);
         this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 5L);
         this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
@@ -135,6 +127,9 @@ public class GameOverFragment extends Fragment{
         removeCurrentScoreFromHighscore();
         root.child("score").removeEventListener(valueEventListener);
         saveScoreToFirebase();
+
+        if (this.newScore > this.score)
+            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), newScore).apply();
     }
 
     /**
@@ -152,6 +147,19 @@ public class GameOverFragment extends Fragment{
         countDownTimer = new CountDownTimer(3000, 5) {
             @Override
             public void onTick(long millisUntilFinished) {
+
+                //
+                if (value == 0L)
+                {
+                    t.setText("");
+                    if(multiplier == "0"){
+                        t.setText(title + " " + value);
+                    }else {
+                        t.setText(title + " " + value + "X " + multiplier);
+                    }
+                    return;
+                }
+
                 // Items
                 floatItem[0] += ((float)value / 3000.0f)*((3000 - millisUntilFinished) - elapsedTime[0]);
                 if (floatItem[0] >= 1) {
@@ -167,6 +175,7 @@ public class GameOverFragment extends Fragment{
                 }
 
                 elapsedTime[0] = 3000 - millisUntilFinished;
+
             }
 
             @Override
@@ -300,7 +309,7 @@ public class GameOverFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MenuNavigationFragment.OnFragmentInteractionListener) {
+        if (context instanceof GameOverFragment.OnFragmentInteractionListener) {
             mListener = (GameOverFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -312,5 +321,15 @@ public class GameOverFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public Long getScore()
+    {
+        return newScore;
+    }
+
+    public void setScore(Long score)
+    {
+        this.newScore = score;
     }
 }

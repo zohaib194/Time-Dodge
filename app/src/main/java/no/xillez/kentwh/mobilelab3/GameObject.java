@@ -24,24 +24,44 @@ public class GameObject extends ShapeDrawable
     protected ArrayList<PointF> collisions = new ArrayList<>();
     protected CollisionState backgroundCollState = new CollisionState(false, false, false, false);
 
-    /*CountDownTimer respawnCountDownTimer = new CountDownTimer(1000, 1) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-
-        }
-
-        @Override
-        public void onFinish() {
-            callbackRespawn();
-        }
-    };*/
-
     GameObject(Shape shape)
     {
         super(shape);
     }
 
-    public void update(float dt, GameObject gameObject) {}
+    public void update(float dt, GameObject gameObject)
+    {
+        // Find new velocity based on acceleration (in landscape mode, x and y is swapped)
+        velocity.x += acceleration.y * 4.0f * dt;
+        velocity.y += acceleration.x * 4.0f * dt;
+
+        // Loop through all ball collisions and add affect
+        for (PointF vec : collisions)
+        {
+            // Update velocity
+            velocity.x += vec.x;
+            velocity.y += vec.y;
+        }
+
+        // We ran through these collisions, clear the list
+        collisions.clear();
+
+        // Find the radius of the object
+        float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
+
+        // Set velocity according to collision state
+        this.setVelocity(((backgroundCollState.left || backgroundCollState.right) ? velocity.x * -1 * 0.50f : velocity.x),
+                ((backgroundCollState.top || backgroundCollState.bottom) ? velocity.y * -1 * 0.50f : velocity.y));
+
+        // Update position with velocity and collision on x-axis and y-axis
+        this.setPosition(new PointF(
+                ((backgroundCollState.left) ? gameObject.getBounds().left + size :
+                        ((backgroundCollState.right) ? gameObject.getBounds().right - size :
+                                position.x + velocity.x)),
+                ((backgroundCollState.top) ? gameObject.getBounds().top + size :
+                        ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - size :
+                                position.y + velocity.y))));
+    }
 
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
     {
@@ -88,23 +108,7 @@ public class GameObject extends ShapeDrawable
         return (diff <= 0);
     }
 
-    /*public void callbackRespawn()
-    {
-        interactionCallback.triggerRespawn(getParentGameObject());
-    }
-
-    public void respawn(PointF pos, PointF vel)
-    {
-        this.setPosition(pos);
-        this.setVelocity(vel);
-    }*/
-
-    /*protected float dot(PointF vec1, PointF vec2)
-    {
-        return ((vec1.x * vec2.x) + (vec1.y * vec2.y));
-    }
-
-    protected PointF norm(PointF vec)
+    /*protected PointF norm(PointF vec)
     {
         float length = (float) Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
         return new PointF(vec.x / length, vec.y / length);
@@ -120,7 +124,6 @@ public class GameObject extends ShapeDrawable
         this.position = position;
     }
 
-    @Deprecated
     public void setPosition(float x, float y)
     {
         this.position.x = x;
@@ -169,25 +172,10 @@ public class GameObject extends ShapeDrawable
         this.collisionCallback = callback;
     }
 
-    /*public void registerInteractionCallback(GameObjectInteractionCallback callback)
-    {
-        this.interactionCallback = callback;
-    }
-
-    public GameObject getParentGameObject()
-    {
-        return this;
-    }*/
-
     interface GameObjectCollisionCallback
     {
         void triggerGameOver();
         void triggerVibration();
         void triggerSound();
     }
-
-    /*interface GameObjectInteractionCallback
-    {
-        void triggerRespawn(GameObject gameObject);
-    }*/
 }

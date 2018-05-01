@@ -7,7 +7,6 @@
     tools:context="no.xillez.kentwh.mobilelab3.MenuActivity"
     android:background="@drawable/background_pattern">
 
-
     <fragment
         android:id="@+id/navigation"
         android:name="no.xillez.kentwh.mobilelab3.MenuNavigationFragment"
@@ -18,8 +17,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintEnd_toStartOf="@id/titleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
@@ -39,5 +37,40 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.984" />
 
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textStyle="bold"
+        android:textSize="50sp"
+        android:drawableStart="@drawable/button_background"
+        android:shadowColor="@color/GREEN"
+        android:shadowRadius="50"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toTopOf="@+id/ball"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
+    <ImageView
+        android:id="@+id/ball"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+
+        android:src="@drawable/drawable_ball"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/ball_description" />
 
 </android.support.constraint.ConstraintLayout>
