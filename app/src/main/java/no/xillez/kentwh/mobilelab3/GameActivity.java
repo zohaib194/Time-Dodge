@@ -4,10 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.support.v4.app.Fragment;
 import android.app.Service;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -124,7 +122,8 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GameOverFragment frag = new GameOverFragment();
-        frag.setScore(gameCanvas.getPoints());
+        frag.setNewScore(gameCanvas.getPoints());
+        frag.setUserName(getIntent().getStringExtra(getString(R.string.preference_username)));
         fragmentTransaction.add(R.id.game_gameover01, frag);
         fragmentTransaction.commit();
 

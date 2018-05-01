@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -41,8 +43,6 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         this.signInButton = findViewById(R.id.sign_in_button);
         this.signInButton.setSize(SignInButton.SIZE_WIDE);
 
-        // Get the last signed in account.
-        this.account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
         // If there isn't userName in shared pref.
         if(this.userName == null){
@@ -61,16 +61,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             });
 
-            // If account is null.
-            if (account == null) {
-                // Enable the button.
-                signInButton.setEnabled(true);
-            } else {
-                // Disable the button.
-                signInButton.setEnabled(false);
-                // Add the account name into shared pref.
-                sharedPreferences.edit().putString(getString(R.string.preference_username), account.getDisplayName()).apply();
-            }
+
         } else {
             // Disable the button.
             signInButton.setEnabled(false);
@@ -84,7 +75,27 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         if (requestCode != RC_SIGN_IN) {
             return;
         }
-        this.signInButton.setEnabled(false);
+        // Get the last signed in account.
+        this.account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        // If account is null.
+        if (account == null) {
+            // Enable the button.
+            signInButton.setEnabled(true);
+            Log.i("test", "is account null: " + (account == null));
+        } else if (account.getDisplayName() != null){
+            Log.i("test", "is account null: " + (account == null) + " | Is name null: " + (account.getDisplayName() == null) + " | Name: " + account.getDisplayName());
+
+            // Disable the button.
+            signInButton.setEnabled(false);
+            // Add the account name into shared pref.
+            this.sharedPreferences.edit().putString(getString(R.string.preference_username), account.getDisplayName()).apply();
+            this.userName = account.getDisplayName();
+
+            Toast.makeText(getApplicationContext(), "Welcome "+ account.getDisplayName(), Toast.LENGTH_LONG).show();
+        } else if (account.getDisplayName() == null){
+            Toast.makeText(getApplicationContext(), "Couldn't get the user name! Try again!", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -94,6 +105,8 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
     public void actionStartGame(View view){
         Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(getString(R.string.preference_username), userName);
+        Log.i("test", "UserName from menu: " + userName);
         startActivity(intent);
     }
 
