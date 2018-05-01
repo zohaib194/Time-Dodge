@@ -1,19 +1,13 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +15,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class GameOverFragment extends Fragment{
 
@@ -31,7 +24,7 @@ public class GameOverFragment extends Fragment{
     private boolean isAnimateDone = false;
 
     private Long score;
-    private Long newScore;
+    private Long newScore = 0L;
     private Long item;
     private Long bonus;
     private Long total;
@@ -53,10 +46,9 @@ public class GameOverFragment extends Fragment{
         this.sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         // Get the data from shared preferences.
-        this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 100L);
-        this.newScore = this.sharedPreferences.getLong(getString(R.string.preference_currentscore), 100L);
-        this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 10L);
-        this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 5L);
+        this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+        this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
+        this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
         this.total = (long)(newScore + (item * 0.5) + (bonus * 0.2));
 
     }
@@ -116,6 +108,9 @@ public class GameOverFragment extends Fragment{
         animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "0.2", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
         animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
+
+        if (this.newScore > this.score)
+            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), newScore).apply();
     }
 
     /**
@@ -133,6 +128,19 @@ public class GameOverFragment extends Fragment{
         countDownTimer = new CountDownTimer(3000, 5) {
             @Override
             public void onTick(long millisUntilFinished) {
+
+                //
+                if (value == 0L)
+                {
+                    t.setText("");
+                    if(multiplier == "0"){
+                        t.setText(title + " " + value);
+                    }else {
+                        t.setText(title + " " + value + "X " + multiplier);
+                    }
+                    return;
+                }
+
                 // Items
                 floatItem[0] += ((float)value / 3000.0f)*((3000 - millisUntilFinished) - elapsedTime[0]);
                 if (floatItem[0] >= 1) {
@@ -148,6 +156,7 @@ public class GameOverFragment extends Fragment{
                 }
 
                 elapsedTime[0] = 3000 - millisUntilFinished;
+
             }
 
             @Override
@@ -203,5 +212,15 @@ public class GameOverFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public Long getScore()
+    {
+        return newScore;
+    }
+
+    public void setScore(Long score)
+    {
+        this.newScore = score;
     }
 }

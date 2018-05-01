@@ -4,28 +4,23 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Fragment;
-import android.app.FragmentContainer;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.PointF;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
 
 public class GameActivity extends AppCompatActivity implements GameObject.GameObjectCollisionCallback, GameOverFragment.OnFragmentInteractionListener
 {
@@ -35,6 +30,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
     private GameCanvas gameCanvas;
     private View fragmentView;
     private Boolean gameOver = false;
+
     // SensorManagers
     private SensorManager sensorManager;
     private Sensor sensor;
@@ -93,6 +89,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         // Un-register sensor listener
         Log.i(LOG_TAG_INFO, "App paused, un-registering sensor listener");
         sensorManager.unregisterListener(gameCanvas);
+        gameCanvas.stopPointGiving();
     }
 
     @Override
@@ -108,10 +105,13 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         if (gameCanvas.isLoggingFirstDrawEvent()) gameCanvas.setLoggingFirstDrawEvent(true);
 
         gameCanvas.setPrevTime(System.currentTimeMillis());
+        gameCanvas.startPointGiving();
     }
 
     @Override
     public void triggerGameOver() {
+        gameCanvas.stopPointGiving();
+
         if(gameOver == true) {
             return;
         }
@@ -119,6 +119,13 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
 
         FrameLayout frameLayout = findViewById(R.id.game_framelayout01);
         frameLayout.setVisibility(View.VISIBLE);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GameOverFragment frag = new GameOverFragment();
+        frag.setScore(gameCanvas.getPoints());
+        fragmentTransaction.add(R.id.game_gameover01, frag);
+        fragmentTransaction.commit();
 
         fragmentView = findViewById(R.id.game_gameover01);
 

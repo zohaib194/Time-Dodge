@@ -10,6 +10,7 @@ import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,22 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     private Long curr_time;
     private Long prev_time;
 
+    private Long points = 0L;
+    private CountDownTimer pointGiver = new CountDownTimer(2000, 1)
+    {
+        @Override
+        public void onTick(long millisUntilFinished) {}
+
+        @Override
+        public void onFinish()
+        {
+            points++;
+            Log.i("PointsTest", "" + points);
+            this.cancel();
+            this.start();
+        }
+    };
+
     // Sensors
     private Sensor sensor;
 
@@ -41,7 +58,6 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
 
     // Ball
     private Ball ball;
-
 
     // Debris
     private Debris debri;
@@ -66,6 +82,8 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         // Setup debris
         Log.i(LOG_TAG_INFO, "Making the debri!");
         makeDebris();
+
+        pointGiver.start();
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
@@ -187,6 +205,21 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     public void setPrevTime(Long time)
     {
         this.prev_time = time;
+    }
+
+    public Long getPoints()
+    {
+        return points;
+    }
+
+    public void stopPointGiving()
+    {
+        pointGiver.cancel();
+    }
+
+    public void startPointGiving()
+    {
+        pointGiver.start();
     }
 
     /*@Override
