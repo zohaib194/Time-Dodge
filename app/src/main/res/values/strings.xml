@@ -20,4 +20,12 @@
     <string name="overall">Overall</string>
     <string name="signin_other_error">Error occured!</string>
     <string name="ball_description">ball as part of logo</string>
+    <string name="frag_gameover_textview02_text">Best Score:</string>
+    <string name="frag_gameover_textview03_text">Items:</string>
+    <string name="frag_gameover_textview04_text">Bonus:</string>
+    <string name="frag_gameover_textview05_text">New Score:</string>
+    <string name="frag_gameover_textview06_text">Total:</string>
+    <string name="frag_gameover_textview07_text">New Score!</string>
+    <string name="frag_gameover_button01_text">Menu</string>
+    <string name="frag_gameover_button02_text">Restart</string>
 </resources>
