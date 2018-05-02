@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * Created by kent on 10.03.18.
  */
 
-public class GameCanvas extends View implements SensorEventListener//, GameObject.GameObjectInteractionCallback
+public class GameCanvas extends View implements SensorEventListener
 {
     // Logging variables
     private static final String LOG_TAG_INFO = "CustomCanvas [INFO]";
@@ -49,7 +49,6 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         public void onFinish()
         {
             points++;
-            Log.i("PointsTest", "" + points);
             this.start();
         }
     };
@@ -282,13 +281,4 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
     {
         pointGiver.start();
     }
-
-    /*@Override
-    public void triggerRespawn(GameObject gameObject)
-    {
-        gameObject.respawn(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4)),
-                (wSize.y / 2) + (float) (Math.cos(Math.random() * 2 * Math.PI) * (wSize.y / 4))),
-        new PointF((ball.getPosition().x - debri.getPosition().x) * 0.05f,
-                (ball.getPosition().y - debri.getPosition().y) * 0.05f));
-    }*/
 }
