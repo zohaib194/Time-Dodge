@@ -46,7 +46,7 @@ public class GameObject extends ShapeDrawable
         // We ran through these collisions, clear the list
         collisions.clear();
 
-        // Find the radius of the object
+        // Find the size of the object
         float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
 
         // Set velocity according to collision state

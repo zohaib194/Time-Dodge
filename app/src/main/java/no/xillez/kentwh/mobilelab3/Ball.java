@@ -14,6 +14,9 @@ public class Ball extends GameObject
     protected int radius = 0;
     protected int color = 0;
 
+    // Variables for effects
+    private boolean ignoreCollisions = true;
+
     // Whether or not collision sound should be played!
     boolean playCollSound = true;
     CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
@@ -46,12 +49,16 @@ public class Ball extends GameObject
         // Update color if changed
         this.getPaint().setColor(color);
 
-        // Loop through all ball collisions and add affect
-        for (PointF vec : collisions)
+        // Disable collision for any effects that require it
+        if (!ignoreCollisions)
         {
-            // Update velocity
-            velocity.x += vec.x;
-            velocity.y += vec.y;
+            // Loop through all ball collisions and add affect
+            for (PointF vec : collisions)
+            {
+                // Update velocity
+                velocity.x += vec.x;
+                velocity.y += vec.y;
+            }
         }
 
         // We ran through these collisions, clear the list
