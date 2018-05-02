@@ -1,6 +1,8 @@
 package no.xillez.kentwh.mobilelab3;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,11 +13,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 
 /**
  * Created by kent on 10.03.18.
@@ -39,6 +43,7 @@ public class GameCanvas extends View implements SensorEventListener
     private float spawnTime = 0.0f;
     private float additiveGameTime = 0.0f;
 
+    private boolean showEffect;
 
     private Long points = 0L;
     private Long bonus = 0L;
@@ -98,6 +103,9 @@ public class GameCanvas extends View implements SensorEventListener
         // Make a debris at first to keep player active in the beginning
         Log.i(LOG_TAG_INFO, "Making a debris to keep player active!");
         makeDebris();
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        showEffect = sharedPref.getBoolean("pref_effect", true);
 
         pointGiver.start();
 
@@ -161,7 +169,9 @@ public class GameCanvas extends View implements SensorEventListener
                 if(!ball.hasCollided) {     // Check if the ball has collided with debris.
                     ballPos = ball.getPosition();
                     bonus++;
-                    bonusAch = "Bonus!";
+                    if (this.showEffect) {
+                        bonusAch = "Bonus!";
+                    }
                 } else {
                     bonusAch = "";
                 }

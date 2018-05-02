@@ -4,12 +4,12 @@
         android:key="pref_ShareScore"
         android:title="@string/pref_ShareScore_Title"
         android:summary="@string/pref_ShareScore_Summary"
-        android:defaultValue="true"/>
+        android:defaultValue="@string/pref_ShareScore_default"/>
 
     <SwitchPreference
         android:key="pref_effect"
         android:title="@string/pref_Effect_Title"
         android:summary="@string/pref_Effect_Summarry"
-        android:defaultValue="true" />
+        android:defaultValue="@string/pref_Effect_default" />
 
 </PreferenceScreen>
