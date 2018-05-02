@@ -62,7 +62,7 @@ public class GameOverFragment extends Fragment{
         this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
       //  this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
-        this.total = (long)(newScore + (item * 0.5) + (bonus * 0.2));
+        this.total = (long)(newScore + (item * 2) + (bonus * 5));
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
     }

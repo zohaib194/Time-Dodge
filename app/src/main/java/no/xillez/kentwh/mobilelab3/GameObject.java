@@ -123,7 +123,7 @@ public class GameObject extends ShapeDrawable
      * @return true if the debris is inside the bonus radius.
      */
     protected boolean checkIfInsideBonusRadius(GameObject gameObject){
-        float radiiAddition = 5.0f;
+        float radiiAddition = 10.0f;
         if(checkCollisionWithOutsideRadius(gameObject, false,0.0f)){
            hasCollided = true;
         }
