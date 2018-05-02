@@ -126,7 +126,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         additiveGameTime += dt * 0.5f;
         spawnTime += additiveGameTime * 0.5f;
 
-        dt_altered = dt * (float)Math.sqrt(Math.pow(ball.velocity.x, 2.0f) + Math.pow(ball.velocity.y, 2.0f));
+        dt_altered = dt * ((float)Math.sqrt(Math.pow(ball.velocity.x, 2.0f) + Math.pow(ball.velocity.y, 2.0f)) * 100);
 
         if (spawnTime > 100 && debris.size() < 10)
         {
@@ -147,14 +147,14 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
                 //Calculate the unit vector (of length 1) in direction of the ball
                 final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - go.getPosition().x,ball.getPosition().y - go.getPosition().y);
                 final PointF normalizedVector = new PointF(
-                        unNormalizedVelocity.x /(Math.abs(unNormalizedVelocity.x) + Math.abs(unNormalizedVelocity.y)),
-                        unNormalizedVelocity.y /(Math.abs(unNormalizedVelocity.x) + Math.abs(unNormalizedVelocity.y))
+                        unNormalizedVelocity.x / (float) Math.sqrt(Math.pow(unNormalizedVelocity.x, 2.0f) + Math.pow(unNormalizedVelocity.y, 2.0f)),
+                        unNormalizedVelocity.y / (float) Math.sqrt(Math.pow(unNormalizedVelocity.x, 2.0f) + Math.pow(unNormalizedVelocity.y, 2.0f))
                 );
 
-                // Set position based on unit vector and ball movement.
+                // Set velocity based on unit vector and random number between .0 and 100
                 go.setVelocity(
-                        normalizedVector.x * dt_altered,
-                        normalizedVector.x * dt_altered
+                        (float) (normalizedVector.x * Math.random() * 10),
+                        (float) (normalizedVector.y * Math.random() * 10)
                 );
             }
 
@@ -164,6 +164,7 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
                     go.checkCollisionWithOutsideRadius(go2);
                 }
             go.checkCollisionWithinSquareBounds(background);
+
         }
 
         // Update ball
@@ -228,8 +229,19 @@ public class GameCanvas extends View implements SensorEventListener//, GameObjec
         debri.setRadius(25);
         debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
                 (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f))));
-        debri.setVelocity(new PointF((ball.getPosition().x - debri.getPosition().x) * 0.025f,
-                (ball.getPosition().y - debri.getPosition().y) * 0.025f));
+
+        //Calculate the unit vector (of length 1) in direction of the ball
+        final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - debri.getPosition().x,ball.getPosition().y - debri.getPosition().y);
+        final PointF normalizedVector = new PointF(
+                unNormalizedVelocity.x / (float)Math.sqrt(Math.pow(unNormalizedVelocity.x, 2) + Math.pow(unNormalizedVelocity.y, 2)),
+                unNormalizedVelocity.y / (float)Math.sqrt(Math.pow(unNormalizedVelocity.x, 2) + Math.pow(unNormalizedVelocity.y, 2))
+        );
+
+        // Set velocity based on unit vector random number between 0 and 100.
+        debri.setVelocity(
+                (float) (normalizedVector.x * Math.random() * 10),
+                (float) (normalizedVector.y * Math.random() * 10)
+        );
         debri.setColor(Color.BLUE);
         debris.add(debri);
     }

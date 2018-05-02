@@ -56,8 +56,8 @@ public class Debris extends GameObject
         isOutside = (hasBeenInside && (backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom));
 
         // Update position with new velocity
-        position.x += velocity.x;
-        position.y += velocity.y;
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
 
         // Update position and collision box
         this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
