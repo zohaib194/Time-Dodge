@@ -3,6 +3,7 @@ package no.xillez.kentwh.mobilelab3;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.shapes.RectShape;
@@ -38,15 +39,27 @@ public class GameCanvas extends View implements SensorEventListener
     private float additiveGameTime = 0.0f;
 
     private Long points = 0L;
-    private CountDownTimer pointGiver = new CountDownTimer(2000, 1)
+    private Long bonus = 0L;
+    private int debrisBonusRadius = -1;
+    private String bonusAch = "Bonus!";
+    private Paint paint = new Paint();
+    private PointF ballPos;
+
+    private CountDownTimer pointGiver = new CountDownTimer(1000, 1)
     {
         @Override
-        public void onTick(long millisUntilFinished) {}
+        public void onTick(long millisUntilFinished) {
+            if(ballPos != null) {
+                ballPos.x -= 0.5f;
+                ballPos.y -= 0.5f;
+            }
+        }
 
         @Override
         public void onFinish()
         {
             points++;
+            bonusAch = "";
             this.start();
         }
     };
@@ -88,6 +101,11 @@ public class GameCanvas extends View implements SensorEventListener
 
         // Ready prev_time for delta time calculation
         prev_time = System.currentTimeMillis();
+
+
+        this.paint.setColor(getResources().getColor(R.color.colorAccent));
+        this.paint.setTextSize(20);
+
     }
 
     public void setSensor(Sensor sensor)
@@ -138,6 +156,22 @@ public class GameCanvas extends View implements SensorEventListener
         // Record all collisions for all game objects
         ball.checkCollisionWithinSquareBounds(background);
 
+        // Checks if there is debris inside bonus radius previously.
+        if (this.debrisBonusRadius != -1) {
+            // Check if the debris has left the bonus radius.
+            if (!ball.checkIfInsideBonusRadius(debris.get(debrisBonusRadius))) {
+                if(!ball.hasCollided) {     // Check if the ball has collided with debris.
+                    ballPos = ball.getPosition();
+                    bonus++;
+                    bonusAch = "Bonus!";
+                } else {
+                    bonusAch = "";
+                }
+                ball.hasCollided = false;
+                this.debrisBonusRadius = -1;        // -1 for no debris being in the bonus radius.
+            }
+        }
+
         for (Debris go : debris)
         {
             if (go.isOutside())
@@ -148,12 +182,19 @@ public class GameCanvas extends View implements SensorEventListener
                         (ball.getPosition().y - go.getPosition().y) * 0.025f);
             }
 
-            ball.checkCollisionWithOutsideRadius(go);
+            ball.checkCollisionWithOutsideRadius(go, true,0.0f);
             for (Debris go2 : debris)
                 if(go != go2) {
-                    go.checkCollisionWithOutsideRadius(go2);
+                    go.checkCollisionWithOutsideRadius(go2, true,0.0f);
                 }
             go.checkCollisionWithinSquareBounds(background);
+
+            // if there is no debris inside the bonus radius previously.
+            if (this.debrisBonusRadius == -1) {
+                if (ball.checkIfInsideBonusRadius(go)) {    // Check if there is any debris inside.
+                    this.debrisBonusRadius = debris.lastIndexOf(go);    // Save the index of debris.
+                }
+            }
         }
 
         // Update ball
@@ -169,6 +210,10 @@ public class GameCanvas extends View implements SensorEventListener
         for (Debris go : debris)
             go.draw(canvas);
 
+        // Draw the bonus text.
+        if(ballPos != null) {
+            canvas.drawText(bonusAch, ballPos.x, ballPos.y, paint);
+        }
         // Disable draw logging after first time
         if (logDrawing)
             logDrawing = false;
@@ -237,6 +282,8 @@ public class GameCanvas extends View implements SensorEventListener
     {
         return points;
     }
+
+    public Long getBonus()  { return bonus; }
 
     public void stopPointGiving()
     {
