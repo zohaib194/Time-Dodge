@@ -82,7 +82,7 @@ public class HighscoreFragment extends Fragment{
                 TextView t1 = view.findViewById(R.id.text1);
                 TextView t2 = view.findViewById(R.id.text2);
 
-                t1.setText(adapterUser.get(position));
+                t1.setText("" + (position + 1) + ". " + adapterUser.get(position));
                 t2.setText(adapterScore.get(position).toString());
 
                 return view;
@@ -93,49 +93,43 @@ public class HighscoreFragment extends Fragment{
         onDBUpdate();
 
         // Top 5 button on click listener
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (scoreList.size() - 1 > 5) {
-                    Long[] scoreArray = new Long[5];
-                    String[] userArray = new String[5];
-                    userArray = userList.subList(0, 5).toArray(userArray);
-                    scoreArray = scoreList.subList(0, 5).toArray(scoreArray);
+        button1.setOnClickListener(v -> {
+            if (scoreList.size() - 1 > 5) {
+                Long[] scoreArray = new Long[5];
+                String[] userArray = new String[5];
+                userArray = userList.subList(0, 5).toArray(userArray);
+                scoreArray = scoreList.subList(0, 5).toArray(scoreArray);
 
-                    adapterScore.clear();
-                    adapterUser.clear();
+                adapterScore.clear();
+                adapterUser.clear();
 
-                    for(int i = 0; i < userArray.length; i++){
-                        adapterUser.add(userArray[i]);
-                        adapterScore.add(scoreArray[i]);
-                    }
-
-                    adapter.notifyDataSetChanged();
+                for(int i = 0; i < userArray.length; i++){
+                    adapterUser.add(userArray[i]);
+                    adapterScore.add(scoreArray[i]);
                 }
+
+                adapter.notifyDataSetChanged();
             }
         });
 
         // Top 10 button on click listener
-        button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if (scoreList.size() - 1 > 10) {
+        button2.setOnClickListener(v -> {
+            if (scoreList.size() - 1 > 10) {
 
-                    Long[] scoreArray = new Long[10];
-                    String[] userArray = new String[10];
-                    userArray = userList.subList(0, 10).toArray(userArray);
-                    scoreArray = scoreList.subList(0, 10).toArray(scoreArray);
+                Long[] scoreArray = new Long[10];
+                String[] userArray = new String[10];
+                userArray = userList.subList(0, 10).toArray(userArray);
+                scoreArray = scoreList.subList(0, 10).toArray(scoreArray);
 
-                    adapterScore.clear();
-                    adapterUser.clear();
+                adapterScore.clear();
+                adapterUser.clear();
 
-                    for(int i = 0; i < userArray.length; i++){
-                        adapterUser.add(userArray[i]);
-                        adapterScore.add(scoreArray[i]);
-                    }
-
-                    adapter.notifyDataSetChanged();
+                for(int i = 0; i < userArray.length; i++){
+                    adapterUser.add(userArray[i]);
+                    adapterScore.add(scoreArray[i]);
                 }
+
+                adapter.notifyDataSetChanged();
             }
         });
 

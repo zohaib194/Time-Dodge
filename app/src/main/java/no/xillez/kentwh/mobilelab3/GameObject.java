@@ -1,6 +1,10 @@
 package no.xillez.kentwh.mobilelab3;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.os.CountDownTimer;
@@ -22,7 +26,12 @@ public class GameObject extends ShapeDrawable
     //protected GameObjectInteractionCallback interactionCallback = null;
 
     protected ArrayList<PointF> collisions = new ArrayList<>();
+
     protected CollisionState backgroundCollState = new CollisionState(false, false, false, false);
+
+    protected boolean hasCollided = false;
+
+    private Paint paint = new Paint();
 
     GameObject(Shape shape)
     {
@@ -79,11 +88,11 @@ public class GameObject extends ShapeDrawable
         return backgroundCollState;
     }
 
-    protected boolean checkCollisionWithOutsideRadius(GameObject gameObject)
+    protected boolean checkCollisionWithOutsideRadius(GameObject gameObject, boolean saveCollResult, float radiiAddition)
     {
         // Find radii of objects
-        float thisRadius = (this.getBounds().width() / 2);
-        float gameObjRadius = (gameObject.getBounds().width() / 2);
+        float thisRadius = (this.getBounds().width() / 2) + radiiAddition;
+        float gameObjRadius = (gameObject.getBounds().width() / 2) ;
 
         // Find vector between objects
         PointF vector = new PointF((this.getPosition().x - gameObject.getPosition().x),
@@ -93,7 +102,7 @@ public class GameObject extends ShapeDrawable
         float diff = (float) (Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) - thisRadius - gameObjRadius);
 
         // If any interesting results
-        if (diff <= 0)
+        if (diff <= 0 && saveCollResult)
         {
             vector = new PointF(vector.x * 0.1f, vector.y * 0.1f);
 
@@ -106,6 +115,19 @@ public class GameObject extends ShapeDrawable
         }
 
         return (diff <= 0);
+    }
+
+    /**
+     * Check if the debris is inside the bonus radius.
+     * @param gameObject is the debris.
+     * @return true if the debris is inside the bonus radius.
+     */
+    protected boolean checkIfInsideBonusRadius(GameObject gameObject){
+        float radiiAddition = 10.0f;
+        if(checkCollisionWithOutsideRadius(gameObject, false,0.0f)){
+           hasCollided = true;
+        }
+        return (checkCollisionWithOutsideRadius(gameObject, false, radiiAddition));
     }
 
     /*protected PointF norm(PointF vec)

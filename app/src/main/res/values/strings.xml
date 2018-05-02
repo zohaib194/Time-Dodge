@@ -25,4 +25,14 @@
     <string name="pref_ShareScore_Summary">If on, your current high score will be saved on firebase and be visible to all users.</string>
     <string name="pref_Effect_Title">Show visual effects</string>
     <string name="pref_Effect_Summarry">Show effects such as text when getting bonus.</string>
+
+    <string name="frag_gameover_textview02_text">Best Score:</string>
+    <string name="frag_gameover_textview03_text">Items:</string>
+    <string name="frag_gameover_textview04_text">Bonus:</string>
+    <string name="frag_gameover_textview05_text">New Score:</string>
+    <string name="frag_gameover_textview06_text">Total:</string>
+    <string name="frag_gameover_textview07_text">New Score!</string>
+    <string name="frag_gameover_button01_text">Menu</string>
+    <string name="frag_gameover_button02_text">Restart</string>
+
 </resources>
