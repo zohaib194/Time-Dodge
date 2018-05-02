@@ -39,7 +39,7 @@ public class GameOverFragment extends Fragment{
     private Long bestScore;
     private Long newScore = 0L;
     private Long item;
-    private Long bonus;
+    private Long bonus = 0L;
     private Long total;
     private TextView t1;
     private TextView t2;
@@ -61,8 +61,8 @@ public class GameOverFragment extends Fragment{
         // Get the data from shared preferences.
         this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
-        this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
-        this.total = (long)(newScore + (item * 0.5) + (bonus * 0.2));
+      //  this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
+        this.total = (long)(newScore + (item * 2) + (bonus * 5));
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
     }
@@ -112,7 +112,7 @@ public class GameOverFragment extends Fragment{
         this.countDownTimer = new CountDownTimer[5];
 
         // "Animating" score, amount of items collected, bonus, and total numbers.
-        animateTextView(countDownTimer[0], t2.getText().subSequence(0, 6), bestScore, "0", t2);
+        animateTextView(countDownTimer[0], t2.getText().subSequence(0, 11), bestScore, "0", t2);
         animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "0.5", t3);
         animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "0.2", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
@@ -224,6 +224,10 @@ public class GameOverFragment extends Fragment{
         };
 
         root.child("score").addListenerForSingleValueEvent(valueEventListener);
+    }
+
+    public void setBonus(Long bonus) {
+        this.bonus = bonus;
     }
 
 
