@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="pref_ShareScore"
+        android:title="@string/pref_ShareScore_Title"
+        android:summary="@string/pref_ShareScore_Summary"
+        android:defaultValue="true"/>
+
+    <SwitchPreference
+        android:key="pref_effect"
+        android:title="@string/pref_Effect_Title"
+        android:summary="@string/pref_Effect_Summarry"
+        android:defaultValue="true" />
+
+</PreferenceScreen>

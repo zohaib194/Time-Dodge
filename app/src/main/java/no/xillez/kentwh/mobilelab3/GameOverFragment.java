@@ -55,10 +55,10 @@ public class GameOverFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Get shared preferences file in private mode.
+        // Get shared settings file in private mode.
         this.sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        // Get the data from shared preferences.
+        // Get the data from shared settings.
         this.score = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 101L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 10L);
         this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 5L);
