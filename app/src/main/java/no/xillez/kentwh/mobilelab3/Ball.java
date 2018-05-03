@@ -51,11 +51,11 @@ public class Ball extends GameObject
         velocity.x += (acceleration.y * dt);
         velocity.y += (acceleration.x * dt);
 
-        if (!hasHadEffect)
+        /*if (!hasHadEffect)
         {
             triggerEffect(1);
             hasHadEffect = true;
-        }
+        }*/
 
         // Set color to yellow if effect is active
         this.getPaint().setColor(((this.hasEffect) ? 0xFFFFFF00 : color));
@@ -115,6 +115,7 @@ public class Ball extends GameObject
         this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
     }
 
+    @Override
     protected boolean checkCollisionWithOutsideRadius(GameObject gameObject, boolean saveCollResult, float radiiAddition)
     {
         // Find radii of objects
@@ -140,18 +141,19 @@ public class Ball extends GameObject
             // Make other gameObject reason collision and update later
             gameObject.saveCollision(new PointF(-vector.x, -vector.y));
         }
-        // Received special item=
-        else if (gameObject instanceof SpecItem)
+        // Received special item
+        else if (diff <= 0 && gameObject instanceof SpecItem)
         {
             // Trigger the special item's effect
-            this.triggerEffect(((SpecItem) gameObject).getEffect());
+            if (!this.hasEffect)
+                this.triggerEffect(((SpecItem) gameObject).getEffect(), ((SpecItem) gameObject));
         }
 
         return (diff <= 0);
     }
 
     @Override
-    public void triggerEffect(int effect)
+    public void triggerEffect(int effect, SpecItem item)
     {
         // No effect (effect for default behaviour)
         if (effect == 0)
@@ -169,6 +171,10 @@ public class Ball extends GameObject
             enableShield = true;
             effectDissTimer.start();
         }
+
+        // Remove current item picked up
+        if (item != null)
+            interactionCallback.triggerSpecItemDespawn(item);
     }
 
     public int getColor()
@@ -203,6 +209,7 @@ public class Ball extends GameObject
 
     interface BallEffectCallback
     {
+        void triggerSpecItemDespawn(SpecItem item);
         void triggerShield(boolean draw);
     }
 

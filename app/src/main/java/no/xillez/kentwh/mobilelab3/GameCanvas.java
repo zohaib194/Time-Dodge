@@ -54,7 +54,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
 
     private Drawable shield = null;
     private boolean drawShield = false;
-    private CountDownTimer despawnItem = new CountDownTimer(20000, 1)
+    private CountDownTimer despawnItem = new CountDownTimer(6000, 1)
     {
         @Override
         public void onTick(long millisUntilFinished) {}
@@ -123,7 +123,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         Log.i(LOG_TAG_INFO, "Making a debris to keep player active!");
         makeDebris();
 
-        //makeSpecItem();
+        makeSpecItem();
 
         pointGiver.start();
 
@@ -239,8 +239,8 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
             }
         }
 
-        //if (specItems.size() > 0)
-        //    ball.checkCollisionWithOutsideRadius(specItems.get(0), false, 0.0f);
+        if (specItems.size() > 0)
+            ball.checkCollisionWithOutsideRadius(specItems.get(0), false, 0.0f);
 
         // Update ball
         ball.update(dt, background);
@@ -385,10 +385,14 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     }
 
     @Override
+    public void triggerSpecItemDespawn(SpecItem item)
+    {
+        specItems.remove(item);
+    }
+
+    @Override
     public void triggerShield(boolean draw)
     {
-        // TODO: Increase collision radius for ball here!
-        Log.i("Test", "triggerShield");
         drawShield = draw;
         radiusDiffOnBallWithEffect = ((draw) ? 50.0f : 0.0f);
         shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);

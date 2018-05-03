@@ -47,7 +47,7 @@ public class GameObject extends ShapeDrawable
         public void onFinish()
         {
             // Reset effects
-            triggerEffect(0);
+            triggerEffect(0, null);
         }
     };
 
@@ -161,7 +161,7 @@ public class GameObject extends ShapeDrawable
         return new PointF(vec.x / length, vec.y / length);
     }*/
 
-    public void triggerEffect(int effect) {}
+    public void triggerEffect(int effect, SpecItem item) {}
 
     public PointF getPosition()
     {

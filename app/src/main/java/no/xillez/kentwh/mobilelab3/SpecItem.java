@@ -18,6 +18,7 @@ public class SpecItem extends GameObject
         super(new RectShape());
     }
 
+    @Override
     public void update(float dt, GameObject gameObject) {}
 
     @Override
@@ -29,6 +30,7 @@ public class SpecItem extends GameObject
         // Update position and collision box
         this.setBounds((int) position.x - size, (int) position.y - size, (int) position.x + size, (int) position.y + size);
 
+        // Draw my self after defining my variables
         super.draw(canvas);
     }
 
