@@ -52,6 +52,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         if(this.userName == null){
             // Start sign in process.
             this.gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("419752442556-pdgcavo1hl5tgj7h43a2rqsl3kep7gm1.apps.googleusercontent.com")
                     .requestProfile()
                     .requestEmail()
                     .build();
