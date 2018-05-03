@@ -45,6 +45,7 @@ public class GameCanvas extends View implements SensorEventListener
     private int debrisBonusRadius = -1;
     private String bonusAch = "Bonus!";
     private Paint paint = new Paint();
+    private Paint scorePaint = new Paint();
     private PointF ballPos;
 
     private CountDownTimer pointGiver = new CountDownTimer(1000, 1)
@@ -108,6 +109,8 @@ public class GameCanvas extends View implements SensorEventListener
         this.paint.setColor(getResources().getColor(R.color.colorAccent));
         this.paint.setTextSize(20);
 
+        this.scorePaint.setColor(getResources().getColor(R.color.colorAccent));
+        this.scorePaint.setTextSize(30);
     }
 
     public void setSensor(Sensor sensor)
@@ -236,6 +239,9 @@ public class GameCanvas extends View implements SensorEventListener
         if(ballPos != null) {
             canvas.drawText(bonusAch, ballPos.x, ballPos.y, paint);
         }
+
+        canvas.drawText("Score: " + points, wSize.x / 2.0f - (String.valueOf("Score: " + points).length() * 0.5f), wSize.y * 0.05f, scorePaint);
+
         // Disable draw logging after first time
         if (logDrawing)
             logDrawing = false;
