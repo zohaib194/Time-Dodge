@@ -14,11 +14,16 @@ public class Ball extends GameObject
     protected int radius = 0;
     protected int color = 0;
 
-    // Variables for effects
-    private boolean ignoreCollisions = true;
+    private boolean hasHadEffect = false;
+
+    // Variables specific to effects
+    private boolean ignoreCollisions = false;
+    private boolean enableShield = false;
+
 
     // Whether or not collision sound should be played!
     boolean playCollSound = true;
+
     CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
         @Override
         public void onTick(long millisUntilFinished) {
@@ -46,8 +51,14 @@ public class Ball extends GameObject
         velocity.x += (acceleration.y * dt);
         velocity.y += (acceleration.x * dt);
 
-        // Update color if changed
-        this.getPaint().setColor(color);
+        if (!hasHadEffect)
+        {
+            triggerEffect(1);
+            hasHadEffect = true;
+        }
+
+        // Set color to yellow if effect is active
+        this.getPaint().setColor(((this.hasEffect) ? 0xFFFFFF00 : color));
 
         // Disable collision for any effects that require it
         if (!ignoreCollisions)
@@ -77,6 +88,10 @@ public class Ball extends GameObject
                     ((backgroundCollState.bottom) ? background.getBounds().bottom - radius :
                         position.y + velocity.y))));
 
+        // Activate shields on canvas
+        if (enableShield)
+            interactionCallback.triggerShield(true);
+
         // Did we collide? if so make GameActivity vibrate phone
         if (backgroundCollState.left || backgroundCollState.right || backgroundCollState.top || backgroundCollState.bottom)
         {
@@ -98,6 +113,62 @@ public class Ball extends GameObject
 
         // Update position and collision box
         this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
+    }
+
+    protected boolean checkCollisionWithOutsideRadius(GameObject gameObject, boolean saveCollResult, float radiiAddition)
+    {
+        // Find radii of objects
+        float thisRadius = (this.getBounds().width() / 2) + radiiAddition;
+        float gameObjRadius = (gameObject.getBounds().width() / 2) ;
+
+        // Find vector between objects
+        PointF vector = new PointF((this.getPosition().x - gameObject.getPosition().x),
+                (this.getPosition().y - gameObject.getPosition().y));
+
+        // Calc the distance between objects
+        float diff = (float) (Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) - thisRadius - gameObjRadius);
+
+        // If any interesting results and it's not any special items
+        if (diff <= 0 && saveCollResult && !(gameObject instanceof SpecItem))
+        {
+            vector = new PointF(vector.x * 0.1f, vector.y * 0.1f);
+
+            // Save collision state for later updating
+            if (!collisions.contains(vector))
+                collisions.add(vector);
+
+            // Make other gameObject reason collision and update later
+            gameObject.saveCollision(new PointF(-vector.x, -vector.y));
+        }
+        // Received special item=
+        else if (gameObject instanceof SpecItem)
+        {
+            // Trigger the special item's effect
+            this.triggerEffect(((SpecItem) gameObject).getEffect());
+        }
+
+        return (diff <= 0);
+    }
+
+    @Override
+    public void triggerEffect(int effect)
+    {
+        // No effect (effect for default behaviour)
+        if (effect == 0)
+        {
+            hasEffect = false;
+            ignoreCollisions = false;
+            enableShield = false;
+            interactionCallback.triggerShield(false);
+        }
+        // Shield effect
+        else if (effect == 1)
+        {
+            hasEffect = true;
+            ignoreCollisions = true;
+            enableShield = true;
+            effectDissTimer.start();
+        }
     }
 
     public int getColor()
@@ -123,6 +194,16 @@ public class Ball extends GameObject
     public void setVibrator(Vibrator vibrator)
     {
         this.vibrator = vibrator;
+    }
+
+    public void registerCollisionCallback(BallEffectCallback callback)
+    {
+        this.interactionCallback = callback;
+    }
+
+    interface BallEffectCallback
+    {
+        void triggerShield(boolean draw);
     }
 
 }

@@ -1,5 +1,6 @@
 package no.xillez.kentwh.mobilelab3;
 
+import android.graphics.Canvas;
 import android.graphics.drawable.shapes.RectShape;
 
 /**
@@ -10,26 +11,25 @@ public class SpecItem extends GameObject
 {
     protected int size = 0;
     protected int color = 0;
+    protected int effect = 0;
 
     SpecItem()
     {
         super(new RectShape());
     }
 
+    public void update(float dt, GameObject gameObject) {}
+
     @Override
-    public void update(float dt, GameObject gameObject)
+    public void draw(Canvas canvas)
     {
         // Update color if changed
         this.getPaint().setColor(color);
 
-        // If we have collision information, move back to limit duplication next frame
-        if (collisions.size() > 0)
-        {
-            // TODO: Add affects if nr of collisions are over 0!
-        }
-
         // Update position and collision box
         this.setBounds((int) position.x - size, (int) position.y - size, (int) position.x + size, (int) position.y + size);
+
+        super.draw(canvas);
     }
 
     public int getColor()
@@ -50,5 +50,15 @@ public class SpecItem extends GameObject
     public void setSize(int size)
     {
         this.size = size;
+    }
+
+    public int getEffect()
+    {
+        return effect;
+    }
+
+    public void setEffect(int effect)
+    {
+        this.effect = effect;
     }
 }

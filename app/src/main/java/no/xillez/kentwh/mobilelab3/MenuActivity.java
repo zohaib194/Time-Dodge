@@ -1,5 +1,6 @@
 package no.xillez.kentwh.mobilelab3;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +16,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
+// TODO: Implement points per sec to make it more fun for the user
 
 public class MenuActivity extends AppCompatActivity implements MenuNavigationFragment.OnFragmentInteractionListener {
     private GoogleSignInOptions gso;
@@ -75,8 +79,17 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         if (requestCode != RC_SIGN_IN) {
             return;
         }
+
+        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+        try
+        {
+            this.account = task.getResult(ApiException.class);
+        } catch (ApiException e)
+        {
+            e.printStackTrace();
+        }
         // Get the last signed in account.
-        this.account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        //this.account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
         // If account is null.
         if (account == null) {
