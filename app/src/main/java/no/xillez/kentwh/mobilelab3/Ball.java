@@ -88,10 +88,6 @@ public class Ball extends GameObject
                     ((backgroundCollState.bottom) ? background.getBounds().bottom - radius :
                         position.y + velocity.y))));
 
-        // Activate shields on canvas
-        if (enableShield)
-            interactionCallback.triggerShield(true);
-
         // Did we collide? if so make GameActivity vibrate phone
         if (backgroundCollState.left || backgroundCollState.right || backgroundCollState.top || backgroundCollState.bottom)
         {
@@ -162,6 +158,7 @@ public class Ball extends GameObject
             ignoreCollisions = false;
             enableShield = false;
             interactionCallback.triggerShield(false);
+            interactionCallback.triggerDebrisSizeGrowth(false);
         }
         // Shield effect
         else if (effect == 1)
@@ -169,9 +166,17 @@ public class Ball extends GameObject
             hasEffect = true;
             ignoreCollisions = true;
             enableShield = true;
+            // Activate shields on canvas
+            if (enableShield)
+                interactionCallback.triggerShield(true);
             effectDissTimer.start();
         }
-
+        else if (effect == 2)
+        {
+            hasEffect = true;
+            interactionCallback.triggerDebrisSizeGrowth(true);
+            effectDissTimer.start();
+        }
         // Remove current item picked up
         if (item != null)
             interactionCallback.triggerSpecItemDespawn(item);
@@ -210,7 +215,8 @@ public class Ball extends GameObject
     interface BallEffectCallback
     {
         void triggerSpecItemDespawn(SpecItem item);
-        void triggerShield(boolean draw);
+        void triggerShield(boolean enable);
+        void triggerDebrisSizeGrowth(boolean enable);
     }
 
 }

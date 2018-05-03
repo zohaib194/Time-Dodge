@@ -341,7 +341,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         item.setColor(Color.MAGENTA);
         item.setPosition(xpos, ypos);
         item.setSize(30);
-        item.setEffect(1);      // Shield effect = 1
+        item.setEffect(2);      // Shield effect = 1
         specItems.add(item);
     }
 
@@ -391,10 +391,18 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     }
 
     @Override
-    public void triggerShield(boolean draw)
+    public void triggerShield(boolean enable)
     {
-        drawShield = draw;
-        radiusDiffOnBallWithEffect = ((draw) ? 50.0f : 0.0f);
+        drawShield = enable;
+        radiusDiffOnBallWithEffect = ((enable) ? 50.0f : 0.0f);
         shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);
+    }
+
+    @Override
+    public void triggerDebrisSizeGrowth(boolean enable) {
+
+        for(Debris deb : debris){
+            deb.setRadius(((enable) ? 50 : 25));
+        }
     }
 }
