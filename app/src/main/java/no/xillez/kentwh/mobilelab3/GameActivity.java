@@ -121,12 +121,12 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        GameOverFragment frag = new GameOverFragment();
+        GameOverFragment frag = (GameOverFragment) getSupportFragmentManager().findFragmentById(R.id.game_gameover01);
         frag.setNewScore(gameCanvas.getPoints());
         frag.setBonus(gameCanvas.getBonus());
         frag.setUserName(getIntent().getStringExtra(getString(R.string.preference_username)));
         frag.setBestScore(getIntent().getLongExtra(getString(R.string.preference_bestscore), 0l));
-        fragmentTransaction.add(R.id.game_gameover01, frag);
+        frag.removeCurrentScoreFromHighscore();
         fragmentTransaction.commit();
 
         fragmentView = findViewById(R.id.game_gameover01);

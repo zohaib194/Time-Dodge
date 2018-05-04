@@ -109,14 +109,12 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     private void getBestScoreFromDB(String userName){
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
-        root.child("score").addListenerForSingleValueEvent(new ValueEventListener() {
+        root.child("score").child(this.userName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot entry : dataSnapshot.getChildren()){
-                    if(entry.child("u").getValue().equals(userName)){
-                        bestScore = (Long) entry.child("s").getValue();
-                        isUserFound = true;
-                    }
+                if(dataSnapshot.exists()){
+                    bestScore = (Long) dataSnapshot.child("s").getValue();
+                    isUserFound = true;
                 }
                 isFireBaseSearchDone = true;
             }

@@ -150,19 +150,16 @@ public class HighscoreFragment extends Fragment{
     }
 
     private void onDBUpdate(){
-        root.child("score").addChildEventListener(new ChildEventListener() {
+        root.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                    if(dataSnapshot1.getKey().equals("u")){
-                        userList.add((String) dataSnapshot1.getValue());
-                        adapterUser.add((String) dataSnapshot1.getValue());
+                for (DataSnapshot user : dataSnapshot.getChildren()){
 
-                    } else {
-                        scoreList.add((Long) dataSnapshot1.getValue());
-                        adapterScore.add((Long) dataSnapshot1.getValue());
+                    userList.add( user.getKey() );
+                    adapterUser.add( user.getKey() );
 
-                    }
+                    scoreList.add((Long) user.child("s").getValue());
+                    adapterScore.add((Long) user.child("s").getValue());
                 }
                 sort(scoreList, userList, 0, scoreList.size() - 1);
                 sort(adapterScore, adapterUser, 0, adapterScore.size() - 1);
