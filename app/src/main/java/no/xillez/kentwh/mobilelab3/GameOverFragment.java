@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ public class GameOverFragment extends Fragment{
     private boolean shouldShareScore;
 
     public String userName = "";
-    private Long bestScore;
+    private Long bestScore = 0L;
     private Long newScore = 0L;
     private Long item;
     private Long bonus = 0L;
@@ -65,7 +64,7 @@ public class GameOverFragment extends Fragment{
 
 
         // Get the data from shared preferences.
-        this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+       // this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
         // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
         this.total = (long)(newScore + (item * 2) + (bonus * 5));
@@ -104,6 +103,7 @@ public class GameOverFragment extends Fragment{
             Intent intent = new Intent(getActivity(), GameActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra(getString(R.string.preference_username), userName);
+            intent.putExtra(getString(R.string.preference_bestscore), bestScore);
             startActivity(intent);
         });
 
@@ -217,10 +217,10 @@ public class GameOverFragment extends Fragment{
                     if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
                         if(((long) entry.child("s").getValue()) < total && entry.child("u").getValue().equals(userName)) {
                             entry.getRef().setValue(null);
+                             saveScoreToFirebase();
                         }
                     }
                 }
-                saveScoreToFirebase();
             }
 
             @Override
@@ -234,6 +234,10 @@ public class GameOverFragment extends Fragment{
 
     public void setBonus(Long bonus) {
         this.bonus = bonus;
+    }
+
+    public void setBestScore(long bestScore) {
+        this.bestScore = bestScore;
     }
 
 

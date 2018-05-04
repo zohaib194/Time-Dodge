@@ -125,6 +125,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         frag.setNewScore(gameCanvas.getPoints());
         frag.setBonus(gameCanvas.getBonus());
         frag.setUserName(getIntent().getStringExtra(getString(R.string.preference_username)));
+        frag.setBestScore(getIntent().getLongExtra(getString(R.string.preference_bestscore), 0l));
         fragmentTransaction.add(R.id.game_gameover01, frag);
         fragmentTransaction.commit();
 

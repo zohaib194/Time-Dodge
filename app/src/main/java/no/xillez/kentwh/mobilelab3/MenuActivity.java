@@ -15,6 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class MenuActivity extends AppCompatActivity implements MenuNavigationFragment.OnFragmentInteractionListener {
@@ -27,6 +32,11 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     private final static int RC_SIGN_IN = 9001;
     private SharedPreferences sharedPreferences;
     private String userName;
+    private Long bestScore;
+    private boolean isFireBaseSearchDone = false;
+    private boolean isUserFound = false;
+
+    private DatabaseReference root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,15 +106,44 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         }
     }
 
+    private void getBestScoreFromDB(String userName){
+        this.root = FirebaseDatabase.getInstance().getReference().getRoot();
+
+        root.child("score").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot entry : dataSnapshot.getChildren()){
+                    if(entry.child("u").getValue().equals(userName)){
+                        bestScore = (Long) entry.child("s").getValue();
+                        isUserFound = true;
+                    }
+                }
+                isFireBaseSearchDone = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
 
     public void actionStartGame(View view){
+        getBestScoreFromDB(userName);
         Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra(getString(R.string.preference_username), userName);
-        startActivity(intent);
+        if(isFireBaseSearchDone && isUserFound) {
+            intent.putExtra(getString(R.string.preference_username), userName);
+            intent.putExtra(getString(R.string.preference_bestscore), bestScore);
+            startActivity(intent);
+        } else if (isFireBaseSearchDone){
+            intent.putExtra(getString(R.string.preference_username), userName);
+            startActivity(intent);
+        }
     }
 
     public void actionStartSetting(View view){
