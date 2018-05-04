@@ -64,7 +64,9 @@ public class GameOverFragment extends Fragment{
 
 
         // Get the data from shared preferences.
-       // this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+        if(bestScore != 0l){
+            this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+        }
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
         // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
         this.total = (long)(newScore + (item * 2) + (bonus * 5));
@@ -119,13 +121,14 @@ public class GameOverFragment extends Fragment{
 
         // "Animating" score, amount of items collected, bonus, and total numbers.
         animateTextView(countDownTimer[0], t2.getText().subSequence(0, 11), bestScore, "0", t2);
-        animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "0.5", t3);
-        animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "0.2", t4);
+        animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "2", t3);
+        animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "5", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
         animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
 
-        removeCurrentScoreFromHighscore();
-
+        if(this.shouldShareScore) {
+            removeCurrentScoreFromHighscore();
+        }
         if (this.newScore > this.bestScore)
             this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), newScore).apply();
     }
@@ -217,10 +220,10 @@ public class GameOverFragment extends Fragment{
                     if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
                         if(((long) entry.child("s").getValue()) < total && entry.child("u").getValue().equals(userName)) {
                             entry.getRef().setValue(null);
-                             saveScoreToFirebase();
                         }
                     }
                 }
+                saveScoreToFirebase();
             }
 
             @Override
