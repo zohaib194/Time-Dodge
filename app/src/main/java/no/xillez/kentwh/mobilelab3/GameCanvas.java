@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by kent on 10.03.18.
@@ -43,6 +44,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
 
     private float itemSpawnTime = 0.0f;
 
+    private Random randGen = new Random();
 
     private Long points = 0L;
     private Long bonus = 0L;
@@ -177,7 +179,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
             spawnTime = 0;
         }
 
-        if (itemSpawnTime > 10 && specItems.size() < 1)
+        if (itemSpawnTime > 100 && specItems.size() < 1)
         {
             makeSpecItem();
             itemSpawnTime = 0;
@@ -341,7 +343,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         item.setColor(Color.MAGENTA);
         item.setPosition(xpos, ypos);
         item.setSize(30);
-        item.setEffect(1);      // Shield effect = 1
+        item.setEffect(randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1
         specItems.add(item);
     }
 
