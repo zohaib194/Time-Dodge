@@ -15,6 +15,26 @@
       },
       "oauth_client": [
         {
+          "client_id": "419752442556-t0i2mqr4om5ja6n27oj00i2ud039d6v5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "no.xillez.kentwh.mobilelab3",
+            "certificate_hash": "4e1b22e90f15e824577200d625af497f91e667b3"
+          }
+        },
+        {
+          "client_id": "419752442556-ei3evor9cbn6j8rrm9edot3gp1l1d0sm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "no.xillez.kentwh.mobilelab3",
+            "certificate_hash": "e1bf64dd61626df1d10f402bbb0b2bbac1f15464"
+          }
+        },
+        {
+          "client_id": "419752442556-pdgcavo1hl5tgj7h43a2rqsl3kep7gm1.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
           "client_id": "419752442556-8daf3tjh3qsmsc7fbq5d66cifg6dub3a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -40,7 +60,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "419752442556-mnd6o33pknfvg5lqoef142joci0oga6u.apps.googleusercontent.com",
+              "client_id": "419752442556-pdgcavo1hl5tgj7h43a2rqsl3kep7gm1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
