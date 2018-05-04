@@ -1,5 +1,6 @@
 package no.xillez.kentwh.mobilelab3;
 
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,7 @@ public class GameOverFragment extends Fragment{
     private boolean isAnimateDone = false;
     private DatabaseReference root;
     private ValueEventListener valueEventListener;
+    private boolean shouldShareScore;
 
     public String userName = "";
     private Long bestScore;
@@ -55,13 +57,17 @@ public class GameOverFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Get shared preferences file in private mode.
+        // Get shared settings file in private mode.
         this.sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        shouldShareScore = sharedPref.getBoolean("pref_ShareScore", true);
+
 
         // Get the data from shared preferences.
         this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
-      //  this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
+        // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
         this.total = (long)(newScore + (item * 2) + (bonus * 5));
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
@@ -194,7 +200,7 @@ public class GameOverFragment extends Fragment{
     }
 
     private void saveScoreToFirebase(){
-        if(userName != null && total > bestScore) {
+        if(userName != null && total > bestScore && this.shouldShareScore) {
             Map<String, Object> map = new HashMap<>();
             map.put("s", total);
             map.put("u", userName);

@@ -33,10 +33,10 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // Get shared preferences file in private mode.
+        // Get shared settings file in private mode.
         this.sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        // Get the data from shared preferences.
+        // Get the data from shared settings.
         this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
 
         // Get the sign in button from view and set the size.
@@ -108,11 +108,13 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     }
 
     public void actionStartSetting(View view){
-        // TODO: Start settings activity
+
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     public void actionStartHighScore(View view){
-        // TODO: Start high score activity
+
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent);
     }

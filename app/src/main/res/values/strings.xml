@@ -20,6 +20,15 @@
     <string name="overall">Overall</string>
     <string name="signin_other_error">Error occured!</string>
     <string name="ball_description">ball as part of logo</string>
+
+    <string name="pref_ShareScore_Title">Share high score</string>
+    <string name="pref_ShareScore_Summary">If on, your current high score will be saved on firebase and be visible to all users.</string>
+    <string name="pref_ShareScore_default">true</string>
+
+    <string name="pref_Effect_Title">Show visual effects</string>
+    <string name="pref_Effect_Summarry">Show effects such as text when getting bonus.</string>
+    <string name="pref_Effect_default">true</string>
+
     <string name="frag_gameover_textview02_text">Best Score:</string>
     <string name="frag_gameover_textview03_text">Items:</string>
     <string name="frag_gameover_textview04_text">Bonus:</string>
@@ -28,4 +37,5 @@
     <string name="frag_gameover_textview07_text">New Score!</string>
     <string name="frag_gameover_button01_text">Menu</string>
     <string name="frag_gameover_button02_text">Restart</string>
+
 </resources>
