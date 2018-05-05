@@ -1,6 +1,7 @@
 package no.xillez.kentwh.mobilelab3;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -42,6 +44,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     private float spawnTime = 0.0f;
     private float additiveGameTime = 0.0f;
 
+    private boolean showEffect;
     private float itemSpawnTime = 0.0f;
 
     private Random randGen = new Random();
@@ -52,6 +55,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     private int debrisBonusRadius = -1;
     private String bonusAch = "Bonus!";
     private Paint paint = new Paint();
+    private Paint scorePaint = new Paint();
     private PointF ballPos;
     private float radiusDiffOnBallWithEffect = 0.0f;
 
@@ -126,7 +130,11 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         Log.i(LOG_TAG_INFO, "Making a debris to keep player active!");
         makeDebris();
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        showEffect = sharedPref.getBoolean("pref_effect", true);
+
         makeSpecItem();
+
 
         pointGiver.start();
 
@@ -137,6 +145,8 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         this.paint.setColor(getResources().getColor(R.color.colorAccent));
         this.paint.setTextSize(20);
 
+        this.scorePaint.setColor(getResources().getColor(R.color.colorAccent));
+        this.scorePaint.setTextSize(30);
     }
 
     public void setSensor(Sensor sensor)
@@ -197,7 +207,9 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
                 if(!ball.hasCollided) {     // Check if the ball has collided with debris.
                     ballPos = ball.getPosition();
                     bonus++;
-                    bonusAch = "Bonus!";
+                    if (this.showEffect) {
+                        bonusAch = "Bonus!";
+                    }
                 } else {
                     bonusAch = "";
                 }
@@ -282,6 +294,9 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         if(ballPos != null) {
             canvas.drawText(bonusAch, ballPos.x, ballPos.y, paint);
         }
+
+        canvas.drawText("Score: " + points, wSize.x / 2.0f - (String.valueOf("Score: " + points).length() * 0.5f), wSize.y * 0.05f, scorePaint);
+
         // Disable draw logging after first time
         if (logDrawing)
             logDrawing = false;

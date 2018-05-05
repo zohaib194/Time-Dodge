@@ -1,13 +1,12 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,8 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.firebase.database.DatabaseReference;
+
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+
 
 // TODO: Implement points per sec to make it more fun for the user
 
@@ -31,17 +33,23 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     private final static int RC_SIGN_IN = 9001;
     private SharedPreferences sharedPreferences;
     private String userName;
+    private Long bestScore;
+    private boolean isFireBaseSearchDone = false;
+    private boolean isUserFound = false;
+
+    private DatabaseReference root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // Get shared preferences file in private mode.
+        // Get shared settings file in private mode.
         this.sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        // Get the data from shared preferences.
+        // Get the data from shared settings.
         this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
+        this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0);
 
         // Get the sign in button from view and set the size.
         this.signInButton = findViewById(R.id.sign_in_button);
@@ -117,16 +125,20 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
     public void actionStartGame(View view){
         Intent intent = new Intent(this, GameActivity.class);
+
         intent.putExtra(getString(R.string.preference_username), userName);
+        intent.putExtra(getString(R.string.preference_bestscore), bestScore);
         startActivity(intent);
     }
 
     public void actionStartSetting(View view){
-        // TODO: Start settings activity
+
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     public void actionStartHighScore(View view){
-        // TODO: Start high score activity
+
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent);
     }
