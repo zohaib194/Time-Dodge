@@ -23,7 +23,6 @@ public class GameObject extends ShapeDrawable
     protected PointF acceleration = new PointF(0.0f, 0.0f);
 
     protected GameObjectCollisionCallback collisionCallback = null;
-    //protected GameObjectInteractionCallback interactionCallback = null;
 
     protected ArrayList<PointF> collisions = new ArrayList<>();
 
@@ -32,6 +31,26 @@ public class GameObject extends ShapeDrawable
     protected boolean hasCollided = false;
 
     private Paint paint = new Paint();
+
+    // Common/often used variables for effects
+    protected Ball.BallEffectCallback interactionCallback = null;
+    protected boolean hasEffect = false;
+    protected CountDownTimer effectDissTimer = new CountDownTimer(5000, 1)
+    {
+        @Override
+        public void onTick(long millisUntilFinished)
+        {
+
+        }
+
+        @Override
+        public void onFinish()
+        {
+            // Reset effects
+            triggerEffect(0, null);
+        }
+    };
+
 
     GameObject(Shape shape)
     {
@@ -55,7 +74,7 @@ public class GameObject extends ShapeDrawable
         // We ran through these collisions, clear the list
         collisions.clear();
 
-        // Find the radius of the object
+        // Find the size of the object
         float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
 
         // Set velocity according to collision state
@@ -70,6 +89,12 @@ public class GameObject extends ShapeDrawable
                 ((backgroundCollState.top) ? gameObject.getBounds().top + size :
                         ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - size :
                                 position.y + velocity.y))));
+    }
+
+    @Override
+    public void draw(Canvas canvas)
+    {
+        super.draw(canvas);
     }
 
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
@@ -135,6 +160,8 @@ public class GameObject extends ShapeDrawable
         float length = (float) Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
         return new PointF(vec.x / length, vec.y / length);
     }*/
+
+    public void triggerEffect(int effect, SpecItem item) {}
 
     public PointF getPosition()
     {

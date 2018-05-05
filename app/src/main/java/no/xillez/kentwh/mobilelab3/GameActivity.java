@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
 
         // Set view
         Log.i(LOG_TAG_INFO, "Setting view!");
-        setContentView(R.layout.activity_game);
+        setContentView(R.layout.activity_game);         // TODO: exception thrown on screen blackout. FIX THIS! PRIORITY OVER 9000.
         gameCanvas = findViewById(R.id.game_gamecanvas01);
 
         // Set screen orientation

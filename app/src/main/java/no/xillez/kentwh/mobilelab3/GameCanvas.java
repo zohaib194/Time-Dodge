@@ -1,6 +1,5 @@
 package no.xillez.kentwh.mobilelab3;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -8,24 +7,26 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
+import java.util.Random;
 
 /**
  * Created by kent on 10.03.18.
  */
 
-public class GameCanvas extends View implements SensorEventListener
+public class GameCanvas extends View implements SensorEventListener, Ball.BallEffectCallback
 {
     // Logging variables
     private static final String LOG_TAG_INFO = "CustomCanvas [INFO]";
@@ -44,14 +45,33 @@ public class GameCanvas extends View implements SensorEventListener
     private float additiveGameTime = 0.0f;
 
     private boolean showEffect;
+    private float itemSpawnTime = 0.0f;
+
+    private Random randGen = new Random();
 
     private Long points = 0L;
     private Long bonus = 0L;
+    private Long itemPoints = 0L;
     private int debrisBonusRadius = -1;
     private String bonusAch = "Bonus!";
     private Paint paint = new Paint();
     private Paint scorePaint = new Paint();
     private PointF ballPos;
+    private float radiusDiffOnBallWithEffect = 0.0f;
+
+    private Drawable shield = null;
+    private boolean drawShield = false;
+    private CountDownTimer despawnItem = new CountDownTimer(6000, 1)
+    {
+        @Override
+        public void onTick(long millisUntilFinished) {}
+
+        @Override
+        public void onFinish()
+        {
+            specItems.clear();
+        }
+    };
 
     private CountDownTimer pointGiver = new CountDownTimer(1000, 1)
     {
@@ -84,9 +104,14 @@ public class GameCanvas extends View implements SensorEventListener
     // Debris
     private ArrayList<Debris> debris = new ArrayList<>();
 
+    // Special Items
+    private ArrayList<SpecItem> specItems = new ArrayList<>();
+
     public GameCanvas(Context context, AttributeSet attr)
     {
         super(context, attr);
+
+        shield = ContextCompat.getDrawable(context, R.drawable.ball_shield_effect);
 
         // Get screen dimensions
         Log.i(LOG_TAG_INFO, "Getting screen size!");
@@ -107,6 +132,9 @@ public class GameCanvas extends View implements SensorEventListener
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         showEffect = sharedPref.getBoolean("pref_effect", true);
+
+        makeSpecItem();
+
 
         pointGiver.start();
 
@@ -141,7 +169,6 @@ public class GameCanvas extends View implements SensorEventListener
 
         //Update things indirectly affected by sensor change.
         update();
-
     }
 
     private void update() {
@@ -153,6 +180,7 @@ public class GameCanvas extends View implements SensorEventListener
 
         additiveGameTime += dt * 0.5f;
         spawnTime += additiveGameTime * 0.5f;
+        itemSpawnTime += dt;
 
         dt_altered = dt * ((float)Math.sqrt(Math.pow(ball.velocity.x, 2.0f) + Math.pow(ball.velocity.y, 2.0f)) * 100);
 
@@ -160,6 +188,13 @@ public class GameCanvas extends View implements SensorEventListener
         {
             makeDebris();
             spawnTime = 0;
+        }
+
+        if (itemSpawnTime > 100 && specItems.size() < 1)
+        {
+            makeSpecItem();
+            itemSpawnTime = 0;
+            despawnItem.start();
         }
 
         // Record all collisions for all game objects
@@ -204,7 +239,7 @@ public class GameCanvas extends View implements SensorEventListener
                 );
             }
 
-            ball.checkCollisionWithOutsideRadius(go, true,0.0f);
+            ball.checkCollisionWithOutsideRadius(go, true, radiusDiffOnBallWithEffect);
             for (Debris go2 : debris)
                 if(go != go2) {
                     go.checkCollisionWithOutsideRadius(go2, true,0.0f);
@@ -218,6 +253,12 @@ public class GameCanvas extends View implements SensorEventListener
                 }
             }
         }
+
+        if (specItems.size() > 0)
+            ball.checkCollisionWithOutsideRadius(specItems.get(0), false, 0.0f);
+
+        if (drawShield)
+            shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);
 
         // Update ball
         ball.update(dt, background);
@@ -242,6 +283,10 @@ public class GameCanvas extends View implements SensorEventListener
         // Draw background, ball and debris
         background.draw(canvas);
         ball.draw(canvas);
+        if (specItems.size() > 0)
+            specItems.get(0).draw(canvas);
+        if (drawShield)
+            shield.draw(canvas);
         for (Debris go : debris)
             go.draw(canvas);
 
@@ -279,6 +324,7 @@ public class GameCanvas extends View implements SensorEventListener
         ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
         ball.setVelocity(new PointF(0.0f, 0.0f));
         ball.setColor(Color.GREEN);
+        ball.registerCollisionCallback(this);
     }
 
     private void makeDebris()
@@ -303,6 +349,21 @@ public class GameCanvas extends View implements SensorEventListener
         );
         debri.setColor(Color.BLUE);
         debris.add(debri);
+    }
+
+    private void makeSpecItem()
+    {
+        // Find position of the screen to spawn the item
+        int xpos = (int) (Math.random() * wSize.x);
+        int ypos = (int) (Math.random() * wSize.y);
+
+        // Make new rectangle shape, set it's color, position and effect. Then add to list
+        SpecItem item = new SpecItem();
+        item.setColor(Color.MAGENTA);
+        item.setPosition(xpos, ypos);
+        item.setSize(30);
+        item.setEffect(randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1, Debris growth = 2
+        specItems.add(item);
     }
 
     public void registerCollisionCallback(GameObject.GameObjectCollisionCallback gameActivity)
@@ -334,6 +395,11 @@ public class GameCanvas extends View implements SensorEventListener
 
     public Long getBonus()  { return bonus; }
 
+    public Long getItemPoints()
+    {
+        return itemPoints;
+    }
+
     public void stopPointGiving()
     {
         pointGiver.cancel();
@@ -342,5 +408,32 @@ public class GameCanvas extends View implements SensorEventListener
     public void startPointGiving()
     {
         pointGiver.start();
+    }
+
+    @Override
+    public void triggerSpecItemDespawn(SpecItem item)
+    {
+        specItems.remove(item);
+    }
+
+    @Override
+    public void triggerItemPoint()
+    {
+        itemPoints++;
+    }
+
+    @Override
+    public void triggerShield(boolean enable)
+    {
+        drawShield = enable;
+        radiusDiffOnBallWithEffect = ((enable) ? 50.0f : 0.0f);
+    }
+
+    @Override
+    public void triggerDebrisSizeGrowth(boolean enable) {
+
+        for(Debris deb : debris){
+            deb.setRadius(((enable) ? 50 : 25));
+        }
     }
 }
