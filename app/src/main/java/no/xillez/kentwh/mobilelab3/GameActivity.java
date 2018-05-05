@@ -154,6 +154,14 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
                 set2.setDuration(300);
 
                 set2.start();
+
+                set2.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        frag.animateScoreScreen();
+                    }
+                });
             }
         });
 

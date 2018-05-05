@@ -122,14 +122,20 @@ public class GameOverFragment extends Fragment{
         this.countDownTimer = new CountDownTimer[5];
 
         // "Animating" score, amount of items collected, bonus, and total numbers.
+        this.animateScoreScreen();
+
+        if (this.newScore > this.bestScore)
+            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+    }
+
+    public void animateScoreScreen() {
+
         animateTextView(countDownTimer[0], t2.getText().subSequence(0, 11), bestScore, "0", t2);
         animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "2", t3);
         animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "5", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
         animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
 
-        if (this.newScore > this.bestScore)
-            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), newScore).apply();
     }
 
     /**
@@ -232,6 +238,7 @@ public class GameOverFragment extends Fragment{
                 }
 
                 saveScoreToFirebase();
+                sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
             }
 
             @Override
