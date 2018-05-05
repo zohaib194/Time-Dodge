@@ -48,6 +48,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
 
     private Long points = 0L;
     private Long bonus = 0L;
+    private Long itemPoints = 0L;
     private int debrisBonusRadius = -1;
     private String bonusAch = "Bonus!";
     private Paint paint = new Paint();
@@ -244,6 +245,9 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         if (specItems.size() > 0)
             ball.checkCollisionWithOutsideRadius(specItems.get(0), false, 0.0f);
 
+        if (drawShield)
+            shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);
+
         // Update ball
         ball.update(dt, background);
 
@@ -343,7 +347,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         item.setColor(Color.MAGENTA);
         item.setPosition(xpos, ypos);
         item.setSize(30);
-        item.setEffect(randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1
+        item.setEffect(randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1, Debris growth = 2
         specItems.add(item);
     }
 
@@ -393,10 +397,23 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     }
 
     @Override
-    public void triggerShield(boolean draw)
+    public void triggerItemPoint()
     {
-        drawShield = draw;
-        radiusDiffOnBallWithEffect = ((draw) ? 50.0f : 0.0f);
-        shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);
+        itemPoints++;
+    }
+
+    @Override
+    public void triggerShield(boolean enable)
+    {
+        drawShield = enable;
+        radiusDiffOnBallWithEffect = ((enable) ? 50.0f : 0.0f);
+    }
+
+    @Override
+    public void triggerDebrisSizeGrowth(boolean enable) {
+
+        for(Debris deb : debris){
+            deb.setRadius(((enable) ? 50 : 25));
+        }
     }
 }

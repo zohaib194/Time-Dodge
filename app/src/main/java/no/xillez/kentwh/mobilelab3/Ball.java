@@ -14,7 +14,7 @@ public class Ball extends GameObject
     protected int radius = 0;
     protected int color = 0;
 
-    private boolean hasHadEffect = false;
+    private int currentEffect = 0;
 
     // Variables specific to effects
     private boolean ignoreCollisions = false;
@@ -51,12 +51,6 @@ public class Ball extends GameObject
         velocity.x += (acceleration.y * dt);
         velocity.y += (acceleration.x * dt);
 
-        /*if (!hasHadEffect)
-        {
-            triggerEffect(1);
-            hasHadEffect = true;
-        }*/
-
         // Set color to yellow if effect is active
         this.getPaint().setColor(((this.hasEffect) ? 0xFFFFFF00 : color));
 
@@ -87,10 +81,6 @@ public class Ball extends GameObject
                 ((backgroundCollState.top) ? background.getBounds().top + radius :
                     ((backgroundCollState.bottom) ? background.getBounds().bottom - radius :
                         position.y + velocity.y))));
-
-        // Activate shields on canvas
-        if (enableShield)
-            interactionCallback.triggerShield(true);
 
         // Did we collide? if so make GameActivity vibrate phone
         if (backgroundCollState.left || backgroundCollState.right || backgroundCollState.top || backgroundCollState.bottom)
@@ -161,7 +151,10 @@ public class Ball extends GameObject
             hasEffect = false;
             ignoreCollisions = false;
             enableShield = false;
-            interactionCallback.triggerShield(false);
+            if (currentEffect == 1)
+                interactionCallback.triggerShield(false);
+            else if (currentEffect == 2)
+                interactionCallback.triggerDebrisSizeGrowth(false);
         }
         // Shield effect
         else if (effect == 1)
@@ -169,12 +162,24 @@ public class Ball extends GameObject
             hasEffect = true;
             ignoreCollisions = true;
             enableShield = true;
+            interactionCallback.triggerShield(true);
+            interactionCallback.triggerItemPoint();
+            effectDissTimer.start();
+        }
+        else if (effect == 2)
+        {
+            hasEffect = true;
+            interactionCallback.triggerDebrisSizeGrowth(true);
+            interactionCallback.triggerItemPoint();
             effectDissTimer.start();
         }
 
         // Remove current item picked up
         if (item != null)
             interactionCallback.triggerSpecItemDespawn(item);
+
+        // Set current effect the ball has for more efficient disabling
+        currentEffect = effect;
     }
 
     public int getColor()
@@ -210,7 +215,11 @@ public class Ball extends GameObject
     interface BallEffectCallback
     {
         void triggerSpecItemDespawn(SpecItem item);
-        void triggerShield(boolean draw);
+        void triggerItemPoint();
+
+        void triggerShield(boolean enable);
+        void triggerDebrisSizeGrowth(boolean enable);
+
     }
 
 }
