@@ -48,6 +48,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
         // Get the data from shared settings.
         this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
+        this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0);
 
         // Get the sign in button from view and set the size.
         this.signInButton = findViewById(R.id.sign_in_button);
@@ -106,42 +107,17 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         }
     }
 
-    private void getBestScoreFromDB(String userName){
-        this.root = FirebaseDatabase.getInstance().getReference().getRoot();
-
-        root.child("score").child(this.userName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    bestScore = (Long) dataSnapshot.child("s").getValue();
-                    isUserFound = true;
-                }
-                isFireBaseSearchDone = true;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
 
     public void actionStartGame(View view){
-        getBestScoreFromDB(userName);
         Intent intent = new Intent(this, GameActivity.class);
-        if(isFireBaseSearchDone && isUserFound) {
-            intent.putExtra(getString(R.string.preference_username), userName);
-            intent.putExtra(getString(R.string.preference_bestscore), bestScore);
-            startActivity(intent);
-        } else if (isFireBaseSearchDone){
-            intent.putExtra(getString(R.string.preference_username), userName);
-            startActivity(intent);
-        }
+
+        intent.putExtra(getString(R.string.preference_username), userName);
+        intent.putExtra(getString(R.string.preference_bestscore), bestScore);
+        startActivity(intent);
     }
 
     public void actionStartSetting(View view){
