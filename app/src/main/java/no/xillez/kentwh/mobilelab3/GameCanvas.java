@@ -380,6 +380,11 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
 
     public Long getBonus()  { return bonus; }
 
+    public Long getItemPoints()
+    {
+        return itemPoints;
+    }
+
     public void stopPointGiving()
     {
         pointGiver.cancel();
