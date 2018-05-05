@@ -70,9 +70,10 @@ public class GameOverFragment extends Fragment{
         }
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
         // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
-        this.total = (long)(newScore + (item * 2) + (bonus * 5));
+
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
+        updateTotal();
     }
 
 
@@ -212,7 +213,7 @@ public class GameOverFragment extends Fragment{
 
     public void removeCurrentScoreFromHighscore(){
 
-        if(this.shouldShareScore) {
+        if(!this.shouldShareScore) {
             return;
         }
 
@@ -241,7 +242,9 @@ public class GameOverFragment extends Fragment{
     }
 
     public void setBonus(Long bonus) {
+
         this.bonus = bonus;
+        updateTotal();
     }
 
     public void setBestScore(long bestScore) {
@@ -281,6 +284,10 @@ public class GameOverFragment extends Fragment{
         mListener = null;
     }
 
+    private void updateTotal(){
+        this.total = (long)(newScore + (item * 2) + (bonus * 5));
+    }
+
     public Long getNewScore()
     {
         return newScore;
@@ -289,6 +296,7 @@ public class GameOverFragment extends Fragment{
     public void setNewScore(Long score)
     {
         this.newScore = score;
+        updateTotal();
     }
 
     public void setUserName(String userName) {
