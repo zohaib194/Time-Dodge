@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GameOverFragment extends Fragment{
 
@@ -33,12 +33,12 @@ public class GameOverFragment extends Fragment{
     private SharedPreferences sharedPreferences;
     private CountDownTimer countDownTimer[];
     private boolean isAnimateDone = false;
-    private DatabaseReference root;
+    private DatabaseReference root = FirebaseDatabase.getInstance().getReference().getRoot();
     private ValueEventListener valueEventListener;
     private boolean shouldShareScore;
 
     public String userName = "";
-    private Long bestScore;
+    private Long bestScore = 0L;
     private Long newScore = 0L;
     private Long item;
     private Long bonus = 0L;
@@ -65,12 +65,15 @@ public class GameOverFragment extends Fragment{
 
 
         // Get the data from shared preferences.
-        this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+        if(bestScore != 0l){
+            this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
+        }
         this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
         // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
-        this.total = (long)(newScore + (item * 2) + (bonus * 5));
+
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
+        updateTotal();
     }
 
 
@@ -104,6 +107,7 @@ public class GameOverFragment extends Fragment{
             Intent intent = new Intent(getActivity(), GameActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra(getString(R.string.preference_username), userName);
+            intent.putExtra(getString(R.string.preference_bestscore), bestScore);
             startActivity(intent);
         });
 
@@ -118,16 +122,20 @@ public class GameOverFragment extends Fragment{
         this.countDownTimer = new CountDownTimer[5];
 
         // "Animating" score, amount of items collected, bonus, and total numbers.
+        this.animateScoreScreen();
+
+        if (this.total > this.bestScore)
+            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+    }
+
+    public void animateScoreScreen() {
+
         animateTextView(countDownTimer[0], t2.getText().subSequence(0, 11), bestScore, "0", t2);
-        animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "0.5", t3);
-        animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "0.2", t4);
+        animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "2", t3);
+        animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "5", t4);
         animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
         animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
 
-        removeCurrentScoreFromHighscore();
-
-        if (this.newScore > this.bestScore)
-            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), newScore).apply();
     }
 
     /**
@@ -200,40 +208,59 @@ public class GameOverFragment extends Fragment{
     }
 
     private void saveScoreToFirebase(){
-        if(userName != null && total > bestScore && this.shouldShareScore) {
+        if(this.userName != null && this.total > this.bestScore && this.shouldShareScore) {
             Map<String, Object> map = new HashMap<>();
-            map.put("s", total);
-            map.put("u", userName);
-            root.child("score").push().updateChildren(map);
+            map.put("s", this.total);
+
+            this.root.child("score").child(this.userName).updateChildren(map);
         }
     }
 
 
-    private void removeCurrentScoreFromHighscore(){
-        valueEventListener = new ValueEventListener() {
+    public void removeCurrentScoreFromHighscore(){
+
+        if(!this.shouldShareScore || this.userName == null) {
+
+            if (bestScore < total) {
+                bestScore = total;
+                sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+            }
+            return;
+        }
+
+        root.child("score").child(this.userName).addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot entry : dataSnapshot.getChildren()) {
-                    if (( entry.child("s").getValue()) != null && entry.child("u").getValue() != null) {
-                        if(((long) entry.child("s").getValue()) < total && entry.child("u").getValue().equals(userName)) {
-                            entry.getRef().setValue(null);
-                        }
+
+                if(dataSnapshot.exists()){
+
+                    if ((Long)dataSnapshot.child("s").getValue() < total) {
+                        dataSnapshot.getRef().removeValue();
+                    }else{
+                        return;
                     }
+
                 }
+
                 saveScoreToFirebase();
+                sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
-
-        root.child("score").addListenerForSingleValueEvent(valueEventListener);
+        });
     }
 
     public void setBonus(Long bonus) {
+
         this.bonus = bonus;
+        updateTotal();
+    }
+
+    public void setBestScore(long bestScore) {
+        this.bestScore = bestScore;
     }
 
 
@@ -269,6 +296,10 @@ public class GameOverFragment extends Fragment{
         mListener = null;
     }
 
+    private void updateTotal(){
+        this.total = (long)(newScore + (item * 2) + (bonus * 5));
+    }
+
     public Long getNewScore()
     {
         return newScore;
@@ -277,6 +308,7 @@ public class GameOverFragment extends Fragment{
     public void setNewScore(Long score)
     {
         this.newScore = score;
+        updateTotal();
     }
 
     public void setUserName(String userName) {

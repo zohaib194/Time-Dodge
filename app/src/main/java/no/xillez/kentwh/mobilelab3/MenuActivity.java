@@ -15,6 +15,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class MenuActivity extends AppCompatActivity implements MenuNavigationFragment.OnFragmentInteractionListener {
@@ -27,6 +32,11 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
     private final static int RC_SIGN_IN = 9001;
     private SharedPreferences sharedPreferences;
     private String userName;
+    private Long bestScore;
+    private boolean isFireBaseSearchDone = false;
+    private boolean isUserFound = false;
+
+    private DatabaseReference root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +48,7 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
         // Get the data from shared settings.
         this.userName = this.sharedPreferences.getString(getString(R.string.preference_username), null);
+        this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0);
 
         // Get the sign in button from view and set the size.
         this.signInButton = findViewById(R.id.sign_in_button);
@@ -103,7 +114,9 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
 
     public void actionStartGame(View view){
         Intent intent = new Intent(this, GameActivity.class);
+
         intent.putExtra(getString(R.string.preference_username), userName);
+        intent.putExtra(getString(R.string.preference_bestscore), bestScore);
         startActivity(intent);
     }
 
