@@ -123,9 +123,6 @@ public class GameOverFragment extends Fragment{
 
         // "Animating" score, amount of items collected, bonus, and total numbers.
         this.animateScoreScreen();
-
-        if (this.total > this.bestScore)
-            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
     }
 
     public void animateScoreScreen() {
@@ -219,12 +216,13 @@ public class GameOverFragment extends Fragment{
 
     public void removeCurrentScoreFromHighscore(){
 
+        if (this.bestScore < this.total){
+            this.bestScore = this.total;
+            sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+        }
+
         if(!this.shouldShareScore || this.userName == null) {
 
-            if (bestScore < total) {
-                bestScore = total;
-                sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
-            }
             return;
         }
 
@@ -243,7 +241,7 @@ public class GameOverFragment extends Fragment{
                 }
 
                 saveScoreToFirebase();
-                sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+
             }
 
             @Override
