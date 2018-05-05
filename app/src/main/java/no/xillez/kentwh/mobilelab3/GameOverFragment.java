@@ -317,6 +317,7 @@ public class GameOverFragment extends Fragment{
     public void setItem(Long item)
     {
         this.item = item;
+        updateTotal();
     }
 
     public void setUserName(String userName) {
