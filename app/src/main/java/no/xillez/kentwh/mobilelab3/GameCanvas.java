@@ -411,7 +411,7 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     }
 
     @Override
-    public void triggerSpecItemDespawn(SpecItem item)
+    public void triggerSpecItemDeSpawn(SpecItem item)
     {
         specItems.remove(item);
     }

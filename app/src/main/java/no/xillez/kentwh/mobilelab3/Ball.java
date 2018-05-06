@@ -3,28 +3,22 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.PointF;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.CountDownTimer;
-import android.os.Vibrator;
-
-/**
- * Created by kent on 10.03.18.
- */
 
 public class Ball extends GameObject
 {
     protected int radius = 0;
     protected int color = 0;
-
     private int currentEffect = 0;
 
     // Variables specific to effects
     private boolean ignoreCollisions = false;
     private boolean enableShield = false;
 
-
     // Whether or not collision sound should be played!
-    boolean playCollSound = true;
+    private boolean playCollSound = true;
 
-    CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
+    // Counter to keep from spamming user with collision sounds
+    private final CountDownTimer playCollSoundTimer = new CountDownTimer(250, 1) {
         @Override
         public void onTick(long millisUntilFinished) {
 
@@ -32,18 +26,25 @@ public class Ball extends GameObject
 
         @Override
         public void onFinish() {
+            // Allow the collision sound to play
             playCollSound = true;
         }
     };
 
-    // Vibrator
-    protected Vibrator vibrator;
-
+    /**
+     *  Constructor of Ball class. Ball is always a oval shape
+     */
     Ball()
     {
         super(new OvalShape());
     }
 
+    /**
+     * Updates the state of the ball during game play.
+     *
+     * @param dt - time since last frame
+     * @param background - the background game-object
+     */
     @Override
     public void update(float dt, GameObject background)
     {
@@ -52,10 +53,10 @@ public class Ball extends GameObject
         velocity.y += (acceleration.x * dt);
 
         // Set color to yellow if effect is active
-        this.getPaint().setColor(((this.hasEffect) ? 0xFFFFFF00 : color));
+        this.getPaint().setColor(((this.hasEffect) ? 0xFFFFFF00 : this.color));
 
         // Disable collision for any effects that require it
-        if (!ignoreCollisions)
+        if (!this.ignoreCollisions)
         {
             // Loop through all ball collisions and add affect
             for (PointF vec : collisions)
@@ -75,11 +76,11 @@ public class Ball extends GameObject
 
         // Update position with velocity and collision on x-axis and y-axis
         this.setPosition(new PointF(
-                ((backgroundCollState.left) ? background.getBounds().left + radius :
-                    ((backgroundCollState.right) ? background.getBounds().right - radius :
+                ((backgroundCollState.left) ? background.getBounds().left + this.radius :
+                    ((backgroundCollState.right) ? background.getBounds().right - this.radius :
                         position.x + velocity.x)),
-                ((backgroundCollState.top) ? background.getBounds().top + radius :
-                    ((backgroundCollState.bottom) ? background.getBounds().bottom - radius :
+                ((backgroundCollState.top) ? background.getBounds().top + this.radius :
+                    ((backgroundCollState.bottom) ? background.getBounds().bottom - this.radius :
                         position.y + velocity.y))));
 
         // Did we collide? if so make GameActivity vibrate phone
@@ -88,23 +89,33 @@ public class Ball extends GameObject
             // trigger vibration
             collisionCallback.triggerVibration();
 
-            // Trigger gameover
+            // Trigger game over
             collisionCallback.triggerGameOver();
 
             // If no collision previous update, play sound
-            if (playCollSound)
+            if (this.playCollSound)
             {
                 collisionCallback.triggerSound();
-                playCollSound = false;
+                this.playCollSound = false;
             }
-            playCollSoundTimer.cancel();
-            playCollSoundTimer.start();
+            this.playCollSoundTimer.cancel();
+            this.playCollSoundTimer.start();
         }
 
         // Update position and collision box
-        this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
+        this.setBounds((int) position.x - this.radius, (int) position.y - this.radius, (int) position.x + this.radius, (int) position.y + this.radius);
     }
 
+    /**
+     * checkCollisionWithOutsideRadius - Checks for circular collision with objects radii.
+     * It adds radiiAddition to check for collision with added this.radius from object. e
+     * And dependent on the state of "saveCollResult" (bool), it'll save the collision result in object.
+     *
+     * @param gameObject - game object to check against
+     * @param saveCollResult - whether to save collision or not
+     * @param radiiAddition - this.radius to add to calculating collision
+     * @return Whether a collision occurred or not
+     */
     @Override
     protected boolean checkCollisionWithOutsideRadius(GameObject gameObject, boolean saveCollResult, float radiiAddition)
     {
@@ -142,6 +153,12 @@ public class Ball extends GameObject
         return (diff <= 0);
     }
 
+    /**
+     * triggers some effect on the ball.
+     *
+     * @param effect - what effect to apply to the ball
+     * @param item - what item is giving the effect
+     */
     @Override
     public void triggerEffect(int effect, SpecItem item)
     {
@@ -149,8 +166,8 @@ public class Ball extends GameObject
         if (effect == 0)
         {
             hasEffect = false;
-            ignoreCollisions = false;
-            enableShield = false;
+            this.ignoreCollisions = false;
+            this.enableShield = false;
             if (currentEffect == 1)
                 interactionCallback.triggerShield(false);
             else if (currentEffect == 2)
@@ -160,12 +177,13 @@ public class Ball extends GameObject
         else if (effect == 1)
         {
             hasEffect = true;
-            ignoreCollisions = true;
-            enableShield = true;
+            this.ignoreCollisions = true;
+            this.enableShield = true;
             interactionCallback.triggerShield(true);
             interactionCallback.triggerItemPoint();
             effectDissTimer.start();
         }
+        // Debris growth effect
         else if (effect == 2)
         {
             hasEffect = true;
@@ -176,50 +194,68 @@ public class Ball extends GameObject
 
         // Remove current item picked up
         if (item != null)
-            interactionCallback.triggerSpecItemDespawn(item);
+            interactionCallback.triggerSpecItemDeSpawn(item);
 
         // Set current effect the ball has for more efficient disabling
         currentEffect = effect;
     }
 
+    /**
+     * Getter for color of ball
+     *
+     * @return integer of the color
+     */
     public int getColor()
     {
-        return color;
+        return this.color;
     }
 
+    /**
+     * Setter for ball color
+     *
+     * @param color - integer for color
+     */
     public void setColor(int color)
     {
         this.color = color;
     }
 
-    public int getRadius()
-    {
-        return radius;
-    }
-
+    /**
+     * Setter for ball radius
+     *
+     * @param radius - radius of ball
+     */
     public void setRadius(int radius)
     {
         this.radius = radius;
     }
 
-    public void setVibrator(Vibrator vibrator)
-    {
-        this.vibrator = vibrator;
-    }
-
+    /**
+     * Function used to register callback. Used to callback if certain events happen.
+     *
+     * Events:
+     * - SpecialItem De-spawn
+     * - Giving item point
+     * - Shield Effect
+     * - Debris growth
+     *
+     * @param callback - Object implementing
+     */
     public void registerCollisionCallback(BallEffectCallback callback)
     {
         this.interactionCallback = callback;
     }
 
+    /**
+     * Interface for effect callback
+     */
     interface BallEffectCallback
     {
-        void triggerSpecItemDespawn(SpecItem item);
+        void triggerSpecItemDeSpawn(SpecItem item);
         void triggerItemPoint();
 
         void triggerShield(boolean enable);
         void triggerDebrisSizeGrowth(boolean enable);
 
     }
-
 }
