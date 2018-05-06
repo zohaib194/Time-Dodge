@@ -4,7 +4,7 @@ Zohaib Butt **[zohaib194](http://prod3.imt.hig.no/zohaib194)** <br>
 Kent Wincent Holt **[kentwh](http://prod3.imt.hig.no/kent)** <br>
 Eldar Hauge Torkelsen **[eldarht](http://prod3.imt.hig.no/eldarht)** <br>
 
-## Time Dodge ## 
+## Time Dodge
 The project specifications can be found here: [Custom Game app (lab 03 expansion)](http://prod3.imt.hig.no/teaching/imt3673/wikis/app-ball-game).
 
 Time dodge is an action, time managment game. The goal is to keep the character from hitting the walls while evade projectiles that will push the character. The main mechanic is the ability to slow down or speed up time based on the movement speed of the character. 
