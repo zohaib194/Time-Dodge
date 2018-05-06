@@ -4,39 +4,63 @@ import android.graphics.Canvas;
 import android.graphics.drawable.shapes.RectShape;
 
 /**
+ * SpecItem handles pickups that alter the behaviour of the game.
+ *
  * Created by kent on 10.03.18.
  */
-
-public class SpecItem extends GameObject
+class SpecItem extends GameObject
 {
-    protected int size = 0;
-    protected int color = 0;
-    protected int effect = 0;
+    /**
+     * Width and height of the square to draw.
+     */
+    private int size = 0;
 
+    /**
+     * Color of the square to draw.
+     */
+    private int color = 0;
+
+    /**
+     * Identifies the effect for the game.
+     */
+    private int effect = 0;
+
+    /**
+     * Constructs the shape of the object to draw.
+     */
     SpecItem()
     {
         super(new RectShape());
     }
 
+    /**
+     *Overrides super to prevent unnecessary check for collision and position updates.
+     *
+     * @param dt delta time since last frame.
+     * @param gameObject Item affecting the update.
+     */
     @Override
     public void update(float dt, GameObject gameObject) {}
 
+
+    /**
+     * Drawn square with size with and height in specified color.
+     *
+     * @param canvas Part of the UI to draw on.
+     */
     @Override
     public void draw(Canvas canvas)
     {
         // Update color if changed
-        this.getPaint().setColor(color);
+        this.getPaint().setColor(this.color);
 
         // Update position and collision box
-        this.setBounds((int) position.x - size, (int) position.y - size, (int) position.x + size, (int) position.y + size);
+        this.setBounds(
+                (int) this.position.x - this.size, (int) this.position.y - this.size,
+                (int) this.position.x + this.size, (int) this.position.y + this.size);
 
         // Draw my self after defining my variables
         super.draw(canvas);
-    }
-
-    public int getColor()
-    {
-        return color;
     }
 
     public void setColor(int color)
@@ -44,22 +68,17 @@ public class SpecItem extends GameObject
         this.color = color;
     }
 
-    public int getSize()
-    {
-        return size;
-    }
-
-    public void setSize(int size)
+    void setSize(int size)
     {
         this.size = size;
     }
 
-    public int getEffect()
+    int getEffect()
     {
         return effect;
     }
 
-    public void setEffect(int effect)
+    void setEffect(int effect)
     {
         this.effect = effect;
     }
