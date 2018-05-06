@@ -1,0 +1,11 @@
+GameCanvas
+	Warnings
+		- Declaration can have final modifier - 11 warnings
+			- cant be fixed because those variables change over time.
+GameObject
+	Warnings
+		- Declaration can have final modifier - 2 warnings
+			- cant be fixed because those variables change over time.
+		- Unused declaration
+			- complains on unused triggerEffect(int, SpecItem) parameters.
+
