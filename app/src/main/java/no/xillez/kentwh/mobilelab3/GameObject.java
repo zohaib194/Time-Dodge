@@ -1,19 +1,12 @@
 package no.xillez.kentwh.mobilelab3;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.os.CountDownTimer;
 
 import java.util.ArrayList;
-
-/**
- * Created by kent on 19.04.18.
- */
 
 public class GameObject extends ShapeDrawable
 {
@@ -30,12 +23,10 @@ public class GameObject extends ShapeDrawable
 
     protected boolean hasCollided = false;
 
-    private Paint paint = new Paint();
-
     // Common/often used variables for effects
     protected Ball.BallEffectCallback interactionCallback = null;
     protected boolean hasEffect = false;
-    protected CountDownTimer effectDissTimer = new CountDownTimer(5000, 1)
+    protected CountDownTimer effectDisTimer = new CountDownTimer(5000, 1)
     {
         @Override
         public void onTick(long millisUntilFinished)
@@ -51,44 +42,52 @@ public class GameObject extends ShapeDrawable
         }
     };
 
-
+    /**
+     * Constructor
+     * @param shape is to be drawn.
+     */
     GameObject(Shape shape)
     {
         super(shape);
     }
 
+    /**
+     * Update the velocity and position according to collision state with gameObject.
+     * @param dt delta time.
+     * @param gameObject is to be updated.
+     */
     public void update(float dt, GameObject gameObject)
     {
         // Find new velocity based on acceleration (in landscape mode, x and y is swapped)
-        velocity.x += acceleration.y * 4.0f * dt;
-        velocity.y += acceleration.x * 4.0f * dt;
+        this.velocity.x += this.acceleration.y * 4.0f * dt;
+        this.velocity.y += this.acceleration.x * 4.0f * dt;
 
         // Loop through all ball collisions and add affect
-        for (PointF vec : collisions)
+        for (PointF vec : this.collisions)
         {
             // Update velocity
-            velocity.x += vec.x;
-            velocity.y += vec.y;
+            this.velocity.x += vec.x;
+            this.velocity.y += vec.y;
         }
 
         // We ran through these collisions, clear the list
-        collisions.clear();
+        this.collisions.clear();
 
         // Find the size of the object
         float size = (this.getBounds().right - this.getBounds().left) / 2.0f;
 
         // Set velocity according to collision state
-        this.setVelocity(((backgroundCollState.left || backgroundCollState.right) ? velocity.x * -1 * 0.50f : velocity.x),
-                ((backgroundCollState.top || backgroundCollState.bottom) ? velocity.y * -1 * 0.50f : velocity.y));
+        this.setVelocity(((this.backgroundCollState.left || this.backgroundCollState.right) ? this.velocity.x * -1 * 0.50f : this.velocity.x),
+                ((this.backgroundCollState.top || this.backgroundCollState.bottom) ? this.velocity.y * -1 * 0.50f : this.velocity.y));
 
         // Update position with velocity and collision on x-axis and y-axis
         this.setPosition(new PointF(
-                ((backgroundCollState.left) ? gameObject.getBounds().left + size :
-                        ((backgroundCollState.right) ? gameObject.getBounds().right - size :
-                                position.x + velocity.x)),
-                ((backgroundCollState.top) ? gameObject.getBounds().top + size :
-                        ((backgroundCollState.bottom) ? gameObject.getBounds().bottom - size :
-                                position.y + velocity.y))));
+                ((this.backgroundCollState.left) ? gameObject.getBounds().left + size :
+                        ((this.backgroundCollState.right) ? gameObject.getBounds().right - size :
+                                this.position.x + this.velocity.x)),
+                ((this.backgroundCollState.top) ? gameObject.getBounds().top + size :
+                        ((this.backgroundCollState.bottom) ? gameObject.getBounds().bottom - size :
+                                this.position.y + this.velocity.y))));
     }
 
     @Override
@@ -97,22 +96,34 @@ public class GameObject extends ShapeDrawable
         super.draw(canvas);
     }
 
+    /**
+     * Check the collision with background.
+     * @param gameObject is the background.
+     * @return the collision state.
+     */
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
     {
         // Save background collision state for later updating
-        backgroundCollState = new CollisionState(
+        this.backgroundCollState = new CollisionState(
                 // Going left        Ball going to pass background's left?
-                (velocity.x < 0 && this.getBounds().left + velocity.x < gameObject.getBounds().left),
+                (this.velocity.x < 0 && this.getBounds().left + this.velocity.x < gameObject.getBounds().left),
                 // Going up          Ball going to pass background's top?
-                (velocity.y < 0 && this.getBounds().top + velocity.y < gameObject.getBounds().top),
+                (this.velocity.y < 0 && this.getBounds().top + this.velocity.y < gameObject.getBounds().top),
                 // Going down        Ball going to pass background's down?
-                (velocity.y > 0 && this.getBounds().bottom + velocity.y > gameObject.getBounds().bottom),
+                (this.velocity.y > 0 && this.getBounds().bottom + this.velocity.y > gameObject.getBounds().bottom),
                 // Going right       Ball right hits background's right?
-                (velocity.x > 0 && this.getBounds().right + velocity.x > gameObject.getBounds().right));;
+                (this.velocity.x > 0 && this.getBounds().right + this.velocity.x > gameObject.getBounds().right));
 
-        return backgroundCollState;
+        return this.backgroundCollState;
     }
 
+    /**
+     * Check collision with gameObject(debris).
+     * @param gameObject is debris.
+     * @param saveCollResult collision state.
+     * @param radiiAddition additional radius around the ball to check collision with.
+     * @return if true is collided.
+     */
     protected boolean checkCollisionWithOutsideRadius(GameObject gameObject, boolean saveCollResult, float radiiAddition)
     {
         // Find radii of objects
@@ -132,8 +143,8 @@ public class GameObject extends ShapeDrawable
             vector = new PointF(vector.x * 0.1f, vector.y * 0.1f);
 
             // Save collision state for later updating
-            if (!collisions.contains(vector))
-                collisions.add(vector);
+            if (!this.collisions.contains(vector))
+                this.collisions.add(vector);
 
             // Make other gameObject reason collision and update later
             gameObject.saveCollision(new PointF(-vector.x, -vector.y));
@@ -150,77 +161,97 @@ public class GameObject extends ShapeDrawable
     protected boolean checkIfInsideBonusRadius(GameObject gameObject){
         float radiiAddition = 10.0f;
         if(checkCollisionWithOutsideRadius(gameObject, false,0.0f)){
-           hasCollided = true;
+            this.hasCollided = true;
         }
         return (checkCollisionWithOutsideRadius(gameObject, false, radiiAddition));
     }
 
-    /*protected PointF norm(PointF vec)
+    public void triggerEffect(int effect, SpecItem item)
     {
-        float length = (float) Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
-        return new PointF(vec.x / length, vec.y / length);
-    }*/
 
-    public void triggerEffect(int effect, SpecItem item) {}
-
-    public PointF getPosition()
-    {
-        return position;
     }
 
+    /**
+     * Get position.
+     * @return position.
+     */
+    public PointF getPosition()
+    {
+        return this.position;
+    }
+
+    /**
+     * Set position
+     * @param position is to be set.
+     */
     public void setPosition(PointF position)
     {
         this.position = position;
     }
 
+    /**
+     * Set position
+     * @param x coordinate.
+     * @param y coordinate.
+     */
     public void setPosition(float x, float y)
     {
         this.position.x = x;
         this.position.y = y;
     }
 
-    public PointF getVelocity()
-    {
-        return velocity;
-    }
-
+    /**
+     * Set velocity
+     * @param velocity is to be set.
+     */
     public void setVelocity(PointF velocity)
     {
         this.velocity = velocity;
     }
 
+    /**
+     * Set velocity
+     * @param x coordinate.
+     * @param y coordinate.
+     */
     public void setVelocity(float x, float y)
     {
         this.velocity.x = x;
         this.velocity.y = y;
     }
 
-    public PointF getAcceleration()
-    {
-        return acceleration;
-    }
-
-    public void setAcceleration(PointF acceleration)
-    {
-        this.acceleration = acceleration;
-    }
-
+    /**
+     * Set acceleration.
+     * @param x coordinate.
+     * @param y coordinate.
+     */
     public void setAcceleration(float x, float y)
     {
         this.acceleration.x = x;
         this.acceleration.y = y;
     }
 
+    /**
+     * Save the collision coordination.
+     * @param dir is where collision occurred.
+     */
     public void saveCollision(PointF dir)
     {
-        collisions.add(dir);
+        this.collisions.add(dir);
     }
 
+    /**
+     * Callback for collision.
+     * @param callback interface of methods to be triggered at collision.
+     */
     public void registerCollisionCallback(GameObjectCollisionCallback callback)
     {
         this.collisionCallback = callback;
     }
 
+    /**
+     * Interface of method to be trigger at collision.
+     */
     interface GameObjectCollisionCallback
     {
         void triggerGameOver();

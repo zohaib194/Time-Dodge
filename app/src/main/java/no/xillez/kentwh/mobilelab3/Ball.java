@@ -164,19 +164,19 @@ public class Ball extends GameObject
             enableShield = true;
             interactionCallback.triggerShield(true);
             interactionCallback.triggerItemPoint();
-            effectDissTimer.start();
+            effectDisTimer.start();
         }
         else if (effect == 2)
         {
             hasEffect = true;
             interactionCallback.triggerDebrisSizeGrowth(true);
             interactionCallback.triggerItemPoint();
-            effectDissTimer.start();
+            effectDisTimer.start();
         }
 
         // Remove current item picked up
         if (item != null)
-            interactionCallback.triggerSpecItemDespawn(item);
+            interactionCallback.triggerSpecItemDeSpawn(item);
 
         // Set current effect the ball has for more efficient disabling
         currentEffect = effect;
@@ -214,7 +214,7 @@ public class Ball extends GameObject
 
     interface BallEffectCallback
     {
-        void triggerSpecItemDespawn(SpecItem item);
+        void triggerSpecItemDeSpawn(SpecItem item);
         void triggerItemPoint();
 
         void triggerShield(boolean enable);

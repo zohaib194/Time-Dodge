@@ -22,23 +22,18 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
- * Created by kent on 10.03.18.
- */
-
 public class GameCanvas extends View implements SensorEventListener, Ball.BallEffectCallback
 {
     // Logging variables
     private static final String LOG_TAG_INFO = "CustomCanvas [INFO]";
-    private static final String LOG_TAG_WARN = "CustomCanvas [WARN]";
     private static final String LOG_TAG_ERROR = "CustomCanvas [ERROR]";
     private boolean logDrawing = true;
 
     // Canvas variables
     private Point wSize;
-    private int MARGIN = 5;
-    private float dt = -1.0f;
-    private float dt_altered = -1.0f;
+    private int MARGIN;
+    private float dt;
+    private float dt_altered;
     private Long curr_time;
     private Long prev_time;
     private float spawnTime = 0.0f;
@@ -49,19 +44,25 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
 
     private Random randGen = new Random();
 
+    // Game variables
     private Long points = 0L;
     private Long bonus = 0L;
     private Long itemPoints = 0L;
     private int debrisBonusRadius = -1;
+
+    // Paint
     private String bonusAch = "Bonus!";
     private Paint paint = new Paint();
     private Paint scorePaint = new Paint();
+
+    // Special Effect variables
     private PointF ballPos;
     private float radiusDiffOnBallWithEffect = 0.0f;
-
-    private Drawable shield = null;
+    private Drawable shield;
     private boolean drawShield = false;
-    private CountDownTimer despawnItem = new CountDownTimer(6000, 1)
+
+    // Timers
+    private CountDownTimer deSpawnItem = new CountDownTimer(6000, 1)
     {
         @Override
         public void onTick(long millisUntilFinished) {}
@@ -111,12 +112,18 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     {
         super(context, attr);
 
-        shield = ContextCompat.getDrawable(context, R.drawable.ball_shield_effect);
+        // Set canvas variables.
+        this.MARGIN = 5;
+        this.dt = -1.0f;
+        this.curr_time = 0L;
+        this.dt_altered = -1.0f;
 
-        // Get screen dimensions
+        this.shield = ContextCompat.getDrawable(context, R.drawable.ball_shield_effect);
+
+        // Get screen dimensions.
         Log.i(LOG_TAG_INFO, "Getting screen size!");
-        wSize = new Point();
-        wSize.set(context.getResources().getDisplayMetrics().widthPixels, context.getResources().getDisplayMetrics().heightPixels);
+        this.wSize = new Point();
+        this.wSize.set(context.getResources().getDisplayMetrics().widthPixels, context.getResources().getDisplayMetrics().heightPixels);
 
         // Setup background
         Log.i(LOG_TAG_INFO, "Making the background!");
@@ -131,15 +138,15 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         makeDebris();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        showEffect = sharedPref.getBoolean("pref_effect", true);
+        this.showEffect = sharedPref.getBoolean("pref_effect", true);
 
         makeSpecItem();
 
 
-        pointGiver.start();
+        this.pointGiver.start();
 
         // Ready prev_time for delta time calculation
-        prev_time = System.currentTimeMillis();
+        this.prev_time = System.currentTimeMillis();
 
 
         this.paint.setColor(getResources().getColor(R.color.colorAccent));
@@ -149,6 +156,10 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         this.scorePaint.setTextSize(30);
     }
 
+    /**
+     * Setter for sensor.
+     * @param sensor to be set.
+     */
     public void setSensor(Sensor sensor)
     {
         this.sensor = sensor;
@@ -158,75 +169,79 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     public void onSensorChanged(SensorEvent event)
     {
         // Sensor isn't set, return
-        if (sensor == null)
+        if (this.sensor == null)
         {
             Log.e(LOG_TAG_ERROR, "No sensor avaliable!");
             return;
         }
 
         // Use data from sensor to update game objects
-        ball.setAcceleration(event.values[0] * 3.0f, event.values[1] * 3.0f);
+        this.ball.setAcceleration(event.values[0] * 3.0f, event.values[1] * 3.0f);
 
         //Update things indirectly affected by sensor change.
         update();
     }
 
+    /**
+     * Update the ball and debris position, spawn special items, draw visual effects and
+     * invalidate the current frame.
+     */
     private void update() {
 
         // Get time since last frame
-        curr_time = System.currentTimeMillis();
-        dt = (curr_time - prev_time) / 1000.0f;
-        prev_time = curr_time;
+        this.curr_time = System.currentTimeMillis();
+        this.dt = (this.curr_time - this.prev_time) / 1000.0f;
+        this.prev_time = this.curr_time;
 
-        additiveGameTime += dt * 0.5f;
-        spawnTime += additiveGameTime * 0.5f;
-        itemSpawnTime += dt;
+        this.additiveGameTime += this.dt * 0.5f;
+        this.spawnTime += this.additiveGameTime * 0.5f;
+        this.itemSpawnTime += this.dt;
 
-        dt_altered = dt * ((float)Math.sqrt(Math.pow(ball.velocity.x, 2.0f) + Math.pow(ball.velocity.y, 2.0f)) * 100);
+        this.dt_altered = this.dt * ((float)Math.sqrt(Math.pow(this.ball.velocity.x, 2.0f) + Math.pow(this.ball.velocity.y, 2.0f)) * 100);
 
-        if (spawnTime > 100 && debris.size() < 10)
+        if (this.spawnTime > 100 && this.debris.size() < 10)
         {
             makeDebris();
-            spawnTime = 0;
+            this.spawnTime = 0;
         }
 
-        if (itemSpawnTime > 100 && specItems.size() < 1)
+        if (this.itemSpawnTime > 100 && this.specItems.size() < 1)
         {
             makeSpecItem();
-            itemSpawnTime = 0;
-            despawnItem.start();
+            this.itemSpawnTime = 0;
+            this.deSpawnItem.start();
         }
 
         // Record all collisions for all game objects
-        ball.checkCollisionWithinSquareBounds(background);
+        this.ball.checkCollisionWithinSquareBounds(this.background);
 
         // Checks if there is debris inside bonus radius previously.
         if (this.debrisBonusRadius != -1) {
             // Check if the debris has left the bonus radius.
-            if (!ball.checkIfInsideBonusRadius(debris.get(debrisBonusRadius))) {
-                if(!ball.hasCollided) {     // Check if the ball has collided with debris.
-                    ballPos = ball.getPosition();
-                    bonus++;
+            if (!this.ball.checkIfInsideBonusRadius(this.debris.get(this.debrisBonusRadius))) {
+                if(!this.ball.hasCollided) {     // Check if the ball has collided with debris.
+                    this.ballPos = this.ball.getPosition();
+                    this.bonus++;
                     if (this.showEffect) {
-                        bonusAch = "Bonus!";
+                        this.bonusAch = "Bonus!";
                     }
                 } else {
-                    bonusAch = "";
+                    this.bonusAch = "";
                 }
-                ball.hasCollided = false;
+                this.ball.hasCollided = false;
                 this.debrisBonusRadius = -1;        // -1 for no debris being in the bonus radius.
             }
         }
 
-        for (Debris go : debris)
+        for (Debris go : this.debris)
         {
             if (go.isOutside())
             {
-                go.setPosition((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
-                        (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)));
+                go.setPosition((this.wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((this.wSize.x / 2) * 1.5f)),
+                        (this.wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((this.wSize.x / 2) * 1.5f)));
 
                 //Calculate the unit vector (of length 1) in direction of the ball
-                final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - go.getPosition().x,ball.getPosition().y - go.getPosition().y);
+                final PointF unNormalizedVelocity = new PointF(this.ball.getPosition().x - go.getPosition().x,this.ball.getPosition().y - go.getPosition().y);
                 final PointF normalizedVector = new PointF(
                         unNormalizedVelocity.x / (float) Math.sqrt(Math.pow(unNormalizedVelocity.x, 2.0f) + Math.pow(unNormalizedVelocity.y, 2.0f)),
                         unNormalizedVelocity.y / (float) Math.sqrt(Math.pow(unNormalizedVelocity.x, 2.0f) + Math.pow(unNormalizedVelocity.y, 2.0f))
@@ -239,33 +254,33 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
                 );
             }
 
-            ball.checkCollisionWithOutsideRadius(go, true, radiusDiffOnBallWithEffect);
-            for (Debris go2 : debris)
+            this.ball.checkCollisionWithOutsideRadius(go, true, this.radiusDiffOnBallWithEffect);
+            for (Debris go2 : this.debris)
                 if(go != go2) {
                     go.checkCollisionWithOutsideRadius(go2, true,0.0f);
                 }
-            go.checkCollisionWithinSquareBounds(background);
+            go.checkCollisionWithinSquareBounds(this.background);
 
             // if there is no debris inside the bonus radius previously.
             if (this.debrisBonusRadius == -1) {
-                if (ball.checkIfInsideBonusRadius(go)) {    // Check if there is any debris inside.
-                    this.debrisBonusRadius = debris.lastIndexOf(go);    // Save the index of debris.
+                if (this.ball.checkIfInsideBonusRadius(go)) {    // Check if there is any debris inside.
+                    this.debrisBonusRadius = this.debris.lastIndexOf(go);    // Save the index of debris.
                 }
             }
         }
 
-        if (specItems.size() > 0)
-            ball.checkCollisionWithOutsideRadius(specItems.get(0), false, 0.0f);
+        if (this.specItems.size() > 0)
+            this.ball.checkCollisionWithOutsideRadius(this.specItems.get(0), false, 0.0f);
 
-        if (drawShield)
-            shield.setBounds((int) ball.getPosition().x - 75, (int) ball.getPosition().y - 75, (int) ball.getPosition().x + 75, (int) ball.getPosition().y + 75);
+        if (this.drawShield)
+            this.shield.setBounds((int) this.ball.getPosition().x - 75, (int) this.ball.getPosition().y - 75, (int) this.ball.getPosition().x + 75, (int) this.ball.getPosition().y + 75);
 
         // Update ball
-        ball.update(dt, background);
+        this.ball.update(this.dt, this.background);
 
         // Update all debris
-        for (Debris go : debris)
-            go.update(dt_altered, background);
+        for (Debris go : this.debris)
+            go.update(this.dt_altered, this.background);
 
         // New data is available, current UI/frame is invalid.
         invalidate();
@@ -277,105 +292,115 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
     @Override
     protected void onDraw(Canvas canvas)
     {
-        if (logDrawing)
+        if (this.logDrawing)
             Log.i(LOG_TAG_INFO, "Updating and drawing the background and ball on canvas!");
 
         // Draw background, ball and debris
-        background.draw(canvas);
-        ball.draw(canvas);
-        if (specItems.size() > 0)
-            specItems.get(0).draw(canvas);
-        if (drawShield)
-            shield.draw(canvas);
-        for (Debris go : debris)
+        this.background.draw(canvas);
+        this.ball.draw(canvas);
+        if (this.specItems.size() > 0)
+            this.specItems.get(0).draw(canvas);
+        if (this.drawShield)
+            this.shield.draw(canvas);
+        for (Debris go : this.debris)
             go.draw(canvas);
 
         // Draw the bonus text.
-        if(ballPos != null) {
-            canvas.drawText(bonusAch, ballPos.x, ballPos.y, paint);
+        if(this.ballPos != null) {
+            canvas.drawText(this.bonusAch, this.ballPos.x, this.ballPos.y, this.paint);
         }
 
-        canvas.drawText("Score: " + points, wSize.x / 2.0f - (String.valueOf("Score: " + points).length() * 0.5f), wSize.y * 0.05f, scorePaint);
+        canvas.drawText("Score: " + this.points, this.wSize.x / 2.0f - (String.valueOf("Score: " + this.points).length() * 0.5f), this.wSize.y * 0.05f, this.scorePaint);
 
         // Disable draw logging after first time
-        if (logDrawing)
-            logDrawing = false;
+        if (this.logDrawing)
+            this.logDrawing = false;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
+    /**
+     * Make the background.
+     */
     private void makeBackground()
     {
         // Make new rectangle shape, set it's color, position and collision box
-        background = new GameObject(new RectShape());
-        background.getPaint().setColor(Color.DKGRAY);
-        background.setBounds(MARGIN, MARGIN, wSize.x - MARGIN, wSize.y - MARGIN);
+        this.background = new GameObject(new RectShape());
+        this.background.getPaint().setColor(Color.DKGRAY);
+        this.background.setBounds(this.MARGIN, this.MARGIN, this.wSize.x - this.MARGIN, this.wSize.y - this.MARGIN);
     }
 
+    /**
+     * Make the ball.
+     */
     private void makeBall()
     {
         // Set ball's color, position, velocity, radius and collision box
-        ball = new Ball();
-        ball.setRadius(25);
-        ball.setPosition(new PointF(wSize.x / 2, wSize.y / 2));
-        ball.setVelocity(new PointF(0.0f, 0.0f));
-        ball.setColor(Color.GREEN);
-        ball.registerCollisionCallback(this);
+        this.ball = new Ball();
+        this.ball.setRadius(25);
+        this.ball.setPosition(new PointF(this.wSize.x / 2, this.wSize.y / 2));
+        this.ball.setVelocity(new PointF(0.0f, 0.0f));
+        this.ball.setColor(Color.GREEN);
+        this.ball.registerCollisionCallback(this);
     }
 
+    /**
+     * Make the debris.
+     */
     private void makeDebris()
     {
         // Set ball's color, position, velocity, radius and collision box
-        Debris debri = new Debris();
-        debri.setRadius(25);
-        debri.setPosition(new PointF((wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f)),
-                (wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((wSize.x / 2) * 1.5f))));
+        Debris deb = new Debris();
+        deb.setRadius(25);
+        deb.setPosition(new PointF((this.wSize.x / 2) + (float) (Math.cos(Math.random() * 2.0f * Math.PI) * ((this.wSize.x / 2) * 1.5f)),
+                (this.wSize.y / 2) + (float) (Math.sin(Math.random() * 2.0f * Math.PI) * ((this.wSize.x / 2) * 1.5f))));
 
         //Calculate the unit vector (of length 1) in direction of the ball
-        final PointF unNormalizedVelocity = new PointF(ball.getPosition().x - debri.getPosition().x,ball.getPosition().y - debri.getPosition().y);
+        final PointF unNormalizedVelocity = new PointF(this.ball.getPosition().x - deb.getPosition().x,this.ball.getPosition().y - deb.getPosition().y);
         final PointF normalizedVector = new PointF(
                 unNormalizedVelocity.x / (float)Math.sqrt(Math.pow(unNormalizedVelocity.x, 2) + Math.pow(unNormalizedVelocity.y, 2)),
                 unNormalizedVelocity.y / (float)Math.sqrt(Math.pow(unNormalizedVelocity.x, 2) + Math.pow(unNormalizedVelocity.y, 2))
         );
 
         // Set velocity based on unit vector random number between 0 and 100.
-        debri.setVelocity(
+        deb.setVelocity(
                 (float) (normalizedVector.x * Math.random() * 10),
                 (float) (normalizedVector.y * Math.random() * 10)
         );
-        debri.setColor(Color.BLUE);
-        debris.add(debri);
+        deb.setColor(Color.BLUE);
+        this.debris.add(deb);
     }
 
+    /**
+     * Make special item.
+     */
     private void makeSpecItem()
     {
         // Find position of the screen to spawn the item
-        int xpos = (int) (Math.random() * wSize.x);
-        int ypos = (int) (Math.random() * wSize.y);
+        int xPos = (int) (Math.random() * this.wSize.x);
+        int yPos = (int) (Math.random() * this.wSize.y);
 
         // Make new rectangle shape, set it's color, position and effect. Then add to list
         SpecItem item = new SpecItem();
         item.setColor(Color.MAGENTA);
-        item.setPosition(xpos, ypos);
+        item.setPosition(xPos, yPos);
         item.setSize(30);
-        item.setEffect(randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1, Debris growth = 2
-        specItems.add(item);
+        item.setEffect(this.randGen.nextInt(2 - 1 + 1) + 1);      // Shield effect = 1, Debris growth = 2
+        this.specItems.add(item);
     }
 
+    /**
+     * Collision callback method for GameActivity.
+     * @param gameActivity is the current activity.
+     */
     public void registerCollisionCallback(GameObject.GameObjectCollisionCallback gameActivity)
     {
         // Relay the registration of collision collisionCallback to the ball, if it exists
-        if (ball != null)
-            ball.registerCollisionCallback(gameActivity);
+        if (this.ball != null)
+            this.ball.registerCollisionCallback(gameActivity);
     }
 
     public boolean isLoggingFirstDrawEvent()
     {
-        return logDrawing;
+        return this.logDrawing;
     }
 
     public void setLoggingFirstDrawEvent(boolean logDrawing)
@@ -383,56 +408,93 @@ public class GameCanvas extends View implements SensorEventListener, Ball.BallEf
         this.logDrawing = logDrawing;
     }
 
+    /**
+     * Set previous time.
+     * @param time is the previous time.
+     */
     public void setPrevTime(Long time)
     {
         this.prev_time = time;
     }
 
+    /**
+     * Get the points.
+     * @return points achieved.
+     */
     public Long getPoints()
     {
-        return points;
+        return this.points;
     }
 
-    public Long getBonus()  { return bonus; }
+    /**
+     * Get the bonus.
+     * @return number of bonus achieved.
+     */
+    public Long getBonus()  { return this.bonus; }
 
+    /**
+     * Get the number of pickups.
+     * @return number of pickups.
+     */
     public Long getItemPoints()
     {
-        return itemPoints;
+        return this.itemPoints;
     }
 
+    /**
+     * Cancel the point giver timer.
+     */
     public void stopPointGiving()
     {
-        pointGiver.cancel();
+        this.pointGiver.cancel();
     }
 
+    /**
+     * Start the point giver timer.
+     */
     public void startPointGiving()
     {
-        pointGiver.start();
+        this.pointGiver.start();
     }
 
+    /**
+     * Special item callback for removing the item.
+     * @param item is to be removed.
+     */
     @Override
-    public void triggerSpecItemDespawn(SpecItem item)
+    public void triggerSpecItemDeSpawn(SpecItem item)
     {
-        specItems.remove(item);
+        this.specItems.remove(item);
     }
 
+    /**
+     * Callback to trigger special item points.
+     */
     @Override
     public void triggerItemPoint()
     {
-        itemPoints++;
+        this.itemPoints++;
     }
 
+    /**
+     * Callback to trigger shield.
+     * @param enable if true enable the shield.
+     */
     @Override
     public void triggerShield(boolean enable)
     {
-        drawShield = enable;
-        radiusDiffOnBallWithEffect = ((enable) ? 50.0f : 0.0f);
+        this.drawShield = enable;
+        this.radiusDiffOnBallWithEffect = ((enable) ? 50.0f : 0.0f);
     }
 
+    /**
+     * Callback to trigger growth of debris.
+     * @param enable if true enable the growth of debris.
+     */
     @Override
     public void triggerDebrisSizeGrowth(boolean enable) {
 
-        for(Debris deb : debris){
+        for(Debris deb : this.debris){
             deb.setRadius(((enable) ? 50 : 25));
         }
     }
