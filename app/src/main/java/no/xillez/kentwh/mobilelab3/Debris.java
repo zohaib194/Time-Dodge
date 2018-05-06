@@ -3,10 +3,6 @@ package no.xillez.kentwh.mobilelab3;
 import android.graphics.PointF;
 import android.graphics.drawable.shapes.OvalShape;
 
-/**
- * Created by kent on 10.03.18.
- */
-
 public class Debris extends GameObject
 {
     protected int radius = 0;
@@ -15,11 +11,20 @@ public class Debris extends GameObject
     boolean isOutside = false;
     boolean hasBeenInside = false;
 
+    /**
+     * Constructor for 'Debris' class. Debris is always an oval shape.
+     */
     Debris()
     {
         super(new OvalShape());
     }
 
+    /**
+     * Updates all game related variables.
+     *
+     * @param dt - time since last frame.
+     * @param gameObject - the current game-object to check against.
+     */
     @Override
     public void update(float dt, GameObject gameObject)
     {
@@ -28,7 +33,7 @@ public class Debris extends GameObject
         velocity.y += acceleration.x * dt;
 
         // Update color if changed
-        this.getPaint().setColor(color);
+        this.getPaint().setColor(this.color);
 
         // If we have collision information, move back to limit duplication next frame
         if (collisions.size() > 0)
@@ -49,20 +54,26 @@ public class Debris extends GameObject
         collisions.clear();
 
         // Have I been inside before and am I inside now (not past the edge of the screen).
-        if (!hasBeenInside && !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom))
-            hasBeenInside = !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom);
+        if (!this.hasBeenInside && !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom))
+            this.hasBeenInside = !(backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom);
 
         // have I been inside yet and am I collision now (past the edge of the screen)
-        isOutside = (hasBeenInside && (backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom));
+        this.isOutside = (this.hasBeenInside && (backgroundCollState.left || backgroundCollState.top || backgroundCollState.right || backgroundCollState.bottom));
 
         // Update position with new velocity
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
 
         // Update position and collision box
-        this.setBounds((int) position.x - radius, (int) position.y - radius, (int) position.x + radius, (int) position.y + radius);
+        this.setBounds((int) position.x - this.radius, (int) position.y - this.radius, (int) position.x + this.radius, (int) position.y + this.radius);
     }
 
+    /**
+     * Checks the square collision state of the current frame with the given game object.
+     *
+     * @param gameObject - the game object to check against.
+     * @return Whether or not a collision happened.
+     */
     @Override
     protected CollisionState checkCollisionWithinSquareBounds(GameObject gameObject)
     {
@@ -80,33 +91,43 @@ public class Debris extends GameObject
         return backgroundCollState;
     }
 
+    /**
+     * Getter for debris color.
+     *
+     * @return The color of the debris.
+     */
     public int getColor()
     {
-        return color;
+        return this.color;
     }
 
+    /**
+     * Setter for debris color.
+     *
+     * @param color - color to apply to the debris.
+     */
     public void setColor(int color)
     {
         this.color = color;
     }
 
-    public int getRadius()
-    {
-        return radius;
-    }
-
+    /**
+     * Setter for debris' radius.
+     *
+     * @param radius - the size of the debris radius.
+     */
     public void setRadius(int radius)
     {
         this.radius = radius;
     }
 
+    /**
+     * Getter for whether the debris is outside of the screen or not.
+     *
+     * @return whether the debris is outside of the screen or not.
+     */
     public boolean isOutside()
     {
-        return isOutside;
-    }
-
-    public void setOutside(boolean outside)
-    {
-        isOutside = outside;
+        return this.isOutside;
     }
 }
