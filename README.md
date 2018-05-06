@@ -1,8 +1,8 @@
 ## Project participants ##
 
-Zohaib Butt **[zohaib194](http://prod3.imt.hig.no/zohaib194)**
-Kent Wincent Holt **[kentwh](http://prod3.imt.hig.no/kent)**
-Eldar Hauge Torkelsen **[eldarht](http://prod3.imt.hig.no/eldarht)**
+Zohaib Butt **[zohaib194](http://prod3.imt.hig.no/zohaib194)** <br>
+Kent Wincent Holt **[kentwh](http://prod3.imt.hig.no/kent)** <br>
+Eldar Hauge Torkelsen **[eldarht](http://prod3.imt.hig.no/eldarht)** <br>
 
 ## Time Dodge ## 
 The project specifications can be found here: [Custom Game app (lab 03 expansion)](http://prod3.imt.hig.no/teaching/imt3673/wikis/app-ball-game).
