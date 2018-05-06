@@ -204,15 +204,20 @@ public class GameOverFragment extends Fragment{
         }
     }
 
-    /**
-     * Removes current score from highscore.
-     */
-    public void removeCurrentScoreFromHighscore(){
+    @Override
+    public void onStop() {
+        super.onStop();
 
         if (this.bestScore < this.total){
             this.bestScore = this.total;
             this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), this.total).apply();
         }
+    }
+
+    /**
+     * Removes current score from highscore.
+     */
+    public void removeCurrentScoreFromHighscore(){
 
         // If Share score is turn off and user name is not provided then return.
         if(!this.shouldShareScore || this.userName == null) {

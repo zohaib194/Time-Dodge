@@ -76,7 +76,7 @@ public class HighscoreFragment extends Fragment{
                 TextView t2 = view.findViewById(R.id.text2);
 
                 t1.setText(MessageFormat.format("{0}. {1}", position + 1, adapterUser.get(position)));
-                t2.setText(adapterScore.get(position).toString());
+                t2.setText(MessageFormat.format("{0}", adapterScore.get(position)));
 
                 return view;
             }
