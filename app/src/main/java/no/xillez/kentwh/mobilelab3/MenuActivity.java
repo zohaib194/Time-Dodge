@@ -21,7 +21,7 @@ import com.google.android.gms.tasks.Task;
  * Activity for handling interaction with MenuNavigationFragment.
  * It acts as the entry point for the application.
  */
-public class MenuActivity extends AppCompatActivity implements MenuNavigationFragment.OnFragmentInteractionListener {
+public class MenuActivity extends AppCompatActivity{
     private final static int RC_SIGN_IN = 9001;
     private SignInButton signInButton;
     private GoogleSignInAccount account;
@@ -118,11 +118,6 @@ public class MenuActivity extends AppCompatActivity implements MenuNavigationFra
         } else if (account.getDisplayName() == null) {
             Toast.makeText(getApplicationContext(), "Couldn't get the user name! Try again!", Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     /**
