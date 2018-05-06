@@ -40,7 +40,7 @@ public class GameOverFragment extends Fragment{
     public String userName = "";
     private Long bestScore = 0L;
     private Long newScore = 0L;
-    private Long item;
+    private Long item = 0L;
     private Long bonus = 0L;
     private Long total;
     private TextView t1;
@@ -307,6 +307,16 @@ public class GameOverFragment extends Fragment{
     {
         this.newScore = score;
         updateTotal();
+    }
+
+    public Long getItem()
+    {
+        return item;
+    }
+
+    public void setItem(Long item)
+    {
+        this.item = item;
     }
 
     public void setUserName(String userName) {
