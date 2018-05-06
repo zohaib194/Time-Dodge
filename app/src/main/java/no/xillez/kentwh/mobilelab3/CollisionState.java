@@ -1,8 +1,11 @@
 package no.xillez.kentwh.mobilelab3;
 
-public class CollisionState
+class CollisionState
 {
-    public boolean left, top, bottom, right;
+    final boolean left;
+    final boolean top;
+    final boolean bottom;
+    final boolean right;
 
     /**
      * Constructor for 'CollisionState' class. This is a simple container class.
@@ -12,7 +15,7 @@ public class CollisionState
      * @param bottom - the bottom bounds of the object.
      * @param right - the rights bounds of the object.
      */
-    public CollisionState(boolean left, boolean top, boolean bottom, boolean right)
+    CollisionState(boolean left, boolean top, boolean bottom, boolean right)
     {
         this.left = left;
         this.top = top;

@@ -201,16 +201,6 @@ public class Ball extends GameObject
     }
 
     /**
-     * Getter for color of ball
-     *
-     * @return integer of the color
-     */
-    public int getColor()
-    {
-        return this.color;
-    }
-
-    /**
      * Setter for ball color
      *
      * @param color - integer for color

@@ -12,8 +12,6 @@ import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -60,14 +58,16 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         if (vibrator == null)
             Log.i(LOG_TAG_WARN, "Vibrator is null!");
 
-        // Make a media play to play boop sound
+        // Make a media play to play bloop sound
         Log.i(LOG_TAG_INFO, "Trying to get media player!");
         mediaPlayer = MediaPlayer.create(this, R.raw.boop);
 
         // Get accelerometer
         Log.i(LOG_TAG_INFO, "Finding acceleration sensor (accelerometer)!");
         sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        // If sensor manager exists, find sensor
+        if (sensorManager != null)
+            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // Register the sensor listener
         Log.i(LOG_TAG_INFO, "Tying to register sensor!");
@@ -110,7 +110,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
     public void triggerGameOver() {
         gameCanvas.stopPointGiving();
 
-        if(gameOver == true) {
+        if(gameOver) {
             return;
         }
 
@@ -119,18 +119,13 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
         FrameLayout frameLayout = findViewById(R.id.game_framelayout01);
         frameLayout.setVisibility(View.VISIBLE);
 
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GameOverFragment frag = (GameOverFragment) getSupportFragmentManager().findFragmentById(R.id.game_gameover01);
-
         frag.setNewScore(gameCanvas.getPoints());
         frag.setBonus(gameCanvas.getBonus());
         frag.setItem(gameCanvas.getItemPoints());
         frag.setUserName(getIntent().getStringExtra(getString(R.string.preference_username)));
-        frag.setBestScore(getIntent().getLongExtra(getString(R.string.preference_bestscore), 0l));
+        frag.setBestScore(getIntent().getLongExtra(getString(R.string.preference_bestscore), 0L));
         frag.removeCurrentScoreFromHighscore();
-
-       // fragmentTransaction.commit();
 
         fragmentView = findViewById(R.id.game_gameover01);
 
@@ -172,7 +167,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
     @Override
     public void triggerVibration()
     {
-        if(gameOver == true){
+        if(gameOver){
             return;
         }
         // Vibrator exists? Vibrate!
@@ -183,7 +178,7 @@ public class GameActivity extends AppCompatActivity implements GameObject.GameOb
     @Override
     public void triggerSound()
     {
-        if(gameOver == true){
+        if(gameOver){
             return;
         }
         // Media player exists? Play sound!

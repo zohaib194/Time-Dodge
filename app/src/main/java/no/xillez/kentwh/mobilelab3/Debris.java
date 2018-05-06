@@ -92,16 +92,6 @@ public class Debris extends GameObject
     }
 
     /**
-     * Getter for debris color.
-     *
-     * @return The color of the debris.
-     */
-    public int getColor()
-    {
-        return this.color;
-    }
-
-    /**
      * Setter for debris color.
      *
      * @param color - color to apply to the debris.
