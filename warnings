@@ -9,3 +9,25 @@ GameObject
 		- Unused declaration
 			- complains on unused triggerEffect(int, SpecItem) parameters.
 
+
+Ball
+    Warnings
+        - Protected variables can be public
+            - No if future objects will extend ball.
+        - Unused declarations
+            - enableShield is used 2 times in Ball.java
+            
+CollisionState
+    Warnings
+        - None!
+        
+Debris
+    Warnings
+        - Protected variables can be public
+            - No if future objects will extend debris.
+        - Probable bugs
+            - No probable bugs, member variables are set elsewhere and it's widely dependent on collisions.
+
+GameActivity
+    Warnings
+        - None!
