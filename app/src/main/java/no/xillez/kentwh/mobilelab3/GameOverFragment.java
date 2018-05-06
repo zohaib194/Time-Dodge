@@ -23,35 +23,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class GameOverFragment extends Fragment{
 
-    private OnFragmentInteractionListener mListener;
     private SharedPreferences sharedPreferences;
-    private CountDownTimer countDownTimer[];
-    private boolean isAnimateDone = false;
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference().getRoot();
-    private ValueEventListener valueEventListener;
     private boolean shouldShareScore;
 
-    public String userName = "";
+    private String userName = "";
     private Long bestScore = 0L;
     private Long newScore = 0L;
     private Long item = 0L;
     private Long bonus = 0L;
     private Long total;
-    private TextView t1;
-    private TextView t2;
-    private TextView t3;
-    private TextView t4;
-    private TextView t5;
-    private TextView t6;
-    private TextView t7;
-    private Button b1;
-    private Button b2;
+    private TextView textViewBestScore;
+    private TextView textViewItems;
+    private TextView textViewBonus;
+    private TextView textViewNewScore;
+    private TextView textViewTotalScore;
+    private TextView textViewNewBest;
 
 
     @Override
@@ -61,15 +54,13 @@ public class GameOverFragment extends Fragment{
         this.sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        shouldShareScore = sharedPref.getBoolean("pref_ShareScore", true);
+        this.shouldShareScore = sharedPref.getBoolean("pref_ShareScore", true);
 
 
         // Get the data from shared preferences.
-        if(bestScore != 0l){
+        if(this.bestScore != 0L){
             this.bestScore = this.sharedPreferences.getLong(getString(R.string.preference_bestscore), 0L);
         }
-        this.item = this.sharedPreferences.getLong(getString(R.string.preference_item), 0L);
-        // this.bonus = this.sharedPreferences.getLong(getString(R.string.preference_bonus), 0L);
 
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
@@ -85,25 +76,24 @@ public class GameOverFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_gameover, container, false);
 
         // UI setup
-        this.t1 = view.findViewById(R.id.frag_gameover_textview01);
-        this.t2 = view.findViewById(R.id.frag_gameover_textview02);
-        this.t3 = view.findViewById(R.id.frag_gameover_textview03);
-        this.t4 = view.findViewById(R.id.frag_gameover_textview04);
-        this.t5 = view.findViewById(R.id.frag_gameover_textview05);
-        this.t6 = view.findViewById(R.id.frag_gameover_textview06);
-        this.t7 = view.findViewById(R.id.frag_gameover_textview07);
+        this.textViewBestScore = view.findViewById(R.id.frag_gameover_textview02);
+        this.textViewItems = view.findViewById(R.id.frag_gameover_textview03);
+        this.textViewBonus = view.findViewById(R.id.frag_gameover_textview04);
+        this.textViewNewScore = view.findViewById(R.id.frag_gameover_textview05);
+        this.textViewTotalScore = view.findViewById(R.id.frag_gameover_textview06);
+        this.textViewNewBest = view.findViewById(R.id.frag_gameover_textview07);
 
-        this.b1 = view.findViewById(R.id.frag_gameover_button01);
-        this.b2 = view.findViewById(R.id.frag_gameover_button02);
+        Button buttonMenu = view.findViewById(R.id.frag_gameover_button01);
+        Button buttonRestart = view.findViewById(R.id.frag_gameover_button02);
 
         // Event Listeners on buttons
-        this.b1.setOnClickListener(v -> {
+        buttonMenu.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), MenuActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
 
-        this.b2.setOnClickListener(v -> {
+        buttonRestart.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), GameActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra(getString(R.string.preference_username), userName);
@@ -118,62 +108,60 @@ public class GameOverFragment extends Fragment{
     public void onResume() {
         super.onResume();
 
-        // Count down timer to increment numbers in textView.
-        this.countDownTimer = new CountDownTimer[5];
-
         // "Animating" score, amount of items collected, bonus, and total numbers.
         this.animateScoreScreen();
     }
 
+    /**
+     * Animate all the text view fields.
+     */
     public void animateScoreScreen() {
 
-        animateTextView(countDownTimer[0], t2.getText().subSequence(0, 11), bestScore, "0", t2);
-        animateTextView(countDownTimer[1], t3.getText().subSequence(0, 6), item, "2", t3);
-        animateTextView(countDownTimer[2], t4.getText().subSequence(0, 6), bonus, "5", t4);
-        animateTextView(countDownTimer[3], t5.getText().subSequence(0, 10), newScore, "0", t5);
-        animateTextView(countDownTimer[4], t6.getText().subSequence(0, 6), total, "0", t6);
+        animateTextView(this.textViewBestScore.getText().subSequence(0, 11), this.bestScore, "0", this.textViewBestScore);
+        animateTextView(this.textViewItems.getText().subSequence(0, 6), this.item, "2", this.textViewItems);
+        animateTextView(this.textViewBonus.getText().subSequence(0, 6), this.bonus, "5", this.textViewBonus);
+        animateTextView(this.textViewNewScore.getText().subSequence(0, 10), this.newScore, "0", this.textViewNewScore);
+        animateTextView(this.textViewTotalScore.getText().subSequence(0, 6), this.total, "0", this.textViewTotalScore);
 
     }
 
     /**
      * Animate numbers in text view.
-     * @param countDownTimer timer that runs every 5 milissec for 3 secs.
      * @param title title of fields.
      * @param value a number to reach while incrementing.
      * @param multiplier a number to multiply with score.
-     * @param t textview to set the text.
+     * @param t text view to set the text.
      */
-    private void animateTextView(CountDownTimer countDownTimer, final CharSequence title, final long value, final CharSequence multiplier, final TextView t){
-        final Long[] temp = {0l};
-        final long[] elapsedTime = {0l};
+    private void animateTextView(final CharSequence title, final long value, final CharSequence multiplier, final TextView t){
+        final Long[] temp = {0L};
+        final Long[] elapsedTime = {0L};
         final float[] floatItem = {0.0f};
-        countDownTimer = new CountDownTimer(3000, 5) {
+        CountDownTimer countDownTimer = new CountDownTimer(3000, 5) {
             @Override
             public void onTick(long millisUntilFinished) {
 
-                //
-                if (value == 0L)
-                {
-                    t.setText("");
-                    if(multiplier == "0"){
-                        t.setText(title + " " + value);
-                    }else {
-                        t.setText(title + " " + value + "X " + multiplier);
+                // If value is 0.
+                if (value == 0L) {
+                    t.setText("");  // Clear the text field.
+                    if (multiplier == "0") {    // if multiplier is 0.
+                        t.setText(MessageFormat.format("{0} {1}", title, value)); // Set text without multiplier.
+                    } else {
+                        t.setText(MessageFormat.format("{0} {1} X{2}", title, value, multiplier)); // Show with multiplier.
                     }
                     return;
                 }
 
-                // Items
-                floatItem[0] += ((float)value / 3000.0f)*((3000 - millisUntilFinished) - elapsedTime[0]);
+                // Math for keep incrementing numbers til desired value for 3 secs.
+                floatItem[0] += ((float) value / 3000.0f) * ((3000 - millisUntilFinished) - elapsedTime[0]);
                 if (floatItem[0] >= 1) {
-                    temp[0] += (long)Math.floor(floatItem[0]);
-                    floatItem[0] -= (long)Math.floor(floatItem[0]);
+                    temp[0] += (long) Math.floor(floatItem[0]);
+                    floatItem[0] -= (long) Math.floor(floatItem[0]);
 
                     t.setText("");
-                    if(multiplier == "0"){
-                        t.setText(title + " " + temp[0]);
-                    }else {
-                        t.setText(title + " " + temp[0] + "X " + multiplier);
+                    if (multiplier == "0") {
+                        t.setText(MessageFormat.format("{0} {1}", title, temp[0]));
+                    } else {
+                        t.setText(MessageFormat.format("{0} {1} X{2}", title, temp[0], multiplier));
                     }
                 }
 
@@ -186,25 +174,28 @@ public class GameOverFragment extends Fragment{
                 temp[0] = 0L;
                 floatItem[0] = 0.0f;
                 t.setText("");
-                if(multiplier == "0") {
-                    t.setText(title + " " + value);
+                if (multiplier == "0") {
+                    t.setText(MessageFormat.format("{0} {1}", title, value));
                 } else {
-                    t.setText(title + " " + value + "X " + multiplier);
+                    t.setText(MessageFormat.format("{0} {1} X{2}", title, value, multiplier));
                 }
 
-                if(total > bestScore){
+                if (total > bestScore) {
                     Animation anim = new AlphaAnimation(0.0f, 1.0f);
                     anim.setDuration(100);
                     anim.setStartOffset(20);
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
-                    t7.startAnimation(anim);
+                    textViewNewBest.startAnimation(anim);
                 }
             }
         }.start();
     }
 
-    private void saveScoreToFirebase(){
+    /**
+     * Save the score to FireBase.
+     */
+    private void saveScoreToFireBase(){
         if(this.userName != null && this.total > this.bestScore && this.shouldShareScore) {
             Map<String, Object> map = new HashMap<>();
             map.put("s", this.total);
@@ -213,54 +204,102 @@ public class GameOverFragment extends Fragment{
         }
     }
 
-
-    public void removeCurrentScoreFromHighscore(){
+    @Override
+    public void onStop() {
+        super.onStop();
 
         if (this.bestScore < this.total){
             this.bestScore = this.total;
-            sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), total).apply();
+            this.sharedPreferences.edit().putLong(getString(R.string.preference_bestscore), this.total).apply();
         }
+    }
 
+    /**
+     * Removes current score from highscore.
+     */
+    public void removeCurrentScoreFromHighscore(){
+
+        // If Share score is turn off and user name is not provided then return.
         if(!this.shouldShareScore || this.userName == null) {
-
             return;
         }
 
-        root.child("score").child(this.userName).addListenerForSingleValueEvent( new ValueEventListener() {
+        // Event listener to find the user in FireBase.
+        this.root.child("score").child(this.userName).addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                Long scoreFromFireBase = (Long)dataSnapshot.child("s").getValue();
+                // if the user exist.
                 if(dataSnapshot.exists()){
-
-                    if ((Long)dataSnapshot.child("s").getValue() < total) {
+                    // Check if the current value in FireBase is less the our current total.
+                    if(scoreFromFireBase != null && scoreFromFireBase < total) {
+                        // Remove the value from FireBase.
                         dataSnapshot.getRef().removeValue();
                     }else{
                         return;
                     }
-
                 }
-
-                saveScoreToFirebase();
+                // The current value from FireBase is remove and can add current score to FireBase.
+                saveScoreToFireBase();
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 
+    /**
+     * Set the bonus and update Total.
+     * @param bonus is new bonus to be set.
+     */
     public void setBonus(Long bonus) {
-
         this.bonus = bonus;
         updateTotal();
     }
 
+    /**
+     * Set the best score.
+     * @param bestScore new best score to be set.
+     */
     public void setBestScore(long bestScore) {
         this.bestScore = bestScore;
     }
 
+    /**
+     * Calculate the total score and update.
+     */
+    private void updateTotal(){
+        this.total = this.newScore + (this.item * 2L) + (this.bonus * 5L);
+    }
+
+    /**
+     * Set the new score and update the total.
+     * @param score is new score to be set.
+     */
+    public void setNewScore(Long score)
+    {
+        this.newScore = score;
+        updateTotal();
+    }
+
+    /**
+     * Set the number of item collected in game and update the total.
+     * @param item is the number of items.
+     */
+    public void setItem(Long item)
+    {
+        this.item = item;
+        updateTotal();
+    }
+
+    /**
+     * Set the user name.
+     * @param userName is name to be set.
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -275,52 +314,6 @@ public class GameOverFragment extends Fragment{
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof GameOverFragment.OnFragmentInteractionListener) {
-            mListener = (GameOverFragment.OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    private void updateTotal(){
-        this.total = (long)(newScore + (item * 2) + (bonus * 5));
-    }
-
-    public Long getNewScore()
-    {
-        return newScore;
-    }
-
-    public void setNewScore(Long score)
-    {
-        this.newScore = score;
-        updateTotal();
-    }
-
-    public Long getItem()
-    {
-        return item;
-    }
-
-    public void setItem(Long item)
-    {
-        this.item = item;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
 }

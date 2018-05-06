@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,29 +19,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
+import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HighscoreFragment extends Fragment{
 
+    // FireBase
     private DatabaseReference root;
-    private ListView highscoreListView;
-    private Button button1;
-    private Button button2;
-    private Button button3;
+
+    // Lists
     private ArrayList<Long> scoreList;
     private ArrayList<Long> adapterScore;
     private ArrayList<String> userList;
     private ArrayList<String> adapterUser;
     private ArrayAdapter adapter;
+
     private OnFragmentInteractionListener mListener;
 
 
@@ -63,10 +56,10 @@ public class HighscoreFragment extends Fragment{
         this.root = FirebaseDatabase.getInstance().getReference().getRoot();
 
         // UI setup.
-        this.highscoreListView = view.findViewById(R.id.frag_highscore_listview01);
-        this.button1 = view.findViewById(R.id.frag_highscore_button01);
-        this.button2 = view.findViewById(R.id.frag_highscore_button02);
-        this.button3 = view.findViewById(R.id.frag_highscore_button03);
+        ListView listViewHighScore = view.findViewById(R.id.frag_highscore_listview01);
+        Button buttonTopFive = view.findViewById(R.id.frag_highscore_button01);
+        Button buttonTopTen = view.findViewById(R.id.frag_highscore_button02);
+        Button buttonOverAll = view.findViewById(R.id.frag_highscore_button03);
 
         // Array lists and setup array list adapter
         this.scoreList = new ArrayList<>();
@@ -82,75 +75,75 @@ public class HighscoreFragment extends Fragment{
                 TextView t1 = view.findViewById(R.id.text1);
                 TextView t2 = view.findViewById(R.id.text2);
 
-                t1.setText("" + (position + 1) + ". " + adapterUser.get(position));
-                t2.setText(adapterScore.get(position).toString());
+                t1.setText(MessageFormat.format("{0}. {1}", position + 1, adapterUser.get(position)));
+                t2.setText(MessageFormat.format("{0}", adapterScore.get(position)));
 
                 return view;
             }
         };
-        this.highscoreListView.setAdapter(adapter);
+        listViewHighScore.setAdapter(this.adapter);
 
         onDBUpdate();
 
         // Top 5 button on click listener
-        button1.setOnClickListener(v -> {
-            if (scoreList.size() - 1 > 5) {
+        buttonTopFive.setOnClickListener(v -> {
+            if (this.scoreList.size() - 1 > 5) {
                 Long[] scoreArray = new Long[5];
                 String[] userArray = new String[5];
-                userArray = userList.subList(0, 5).toArray(userArray);
-                scoreArray = scoreList.subList(0, 5).toArray(scoreArray);
+                userArray = this.userList.subList(0, 5).toArray(userArray);
+                scoreArray = this.scoreList.subList(0, 5).toArray(scoreArray);
 
-                adapterScore.clear();
-                adapterUser.clear();
+                this. adapterScore.clear();
+                this.adapterUser.clear();
 
                 for(int i = 0; i < userArray.length; i++){
-                    adapterUser.add(userArray[i]);
-                    adapterScore.add(scoreArray[i]);
+                    this.adapterUser.add(userArray[i]);
+                    this.adapterScore.add(scoreArray[i]);
                 }
 
-                adapter.notifyDataSetChanged();
+                this.adapter.notifyDataSetChanged();
             }
         });
 
         // Top 10 button on click listener
-        button2.setOnClickListener(v -> {
-            if (scoreList.size() - 1 > 10) {
+        buttonTopTen.setOnClickListener(v -> {
+            if (this.scoreList.size() - 1 > 10) {
 
                 Long[] scoreArray = new Long[10];
                 String[] userArray = new String[10];
-                userArray = userList.subList(0, 10).toArray(userArray);
-                scoreArray = scoreList.subList(0, 10).toArray(scoreArray);
+                userArray = this.userList.subList(0, 10).toArray(userArray);
+                scoreArray = this.scoreList.subList(0, 10).toArray(scoreArray);
 
-                adapterScore.clear();
-                adapterUser.clear();
+                this.adapterScore.clear();
+                this.adapterUser.clear();
 
                 for(int i = 0; i < userArray.length; i++){
-                    adapterUser.add(userArray[i]);
-                    adapterScore.add(scoreArray[i]);
+                    this.adapterUser.add(userArray[i]);
+                    this.adapterScore.add(scoreArray[i]);
                 }
 
-                adapter.notifyDataSetChanged();
+                this.adapter.notifyDataSetChanged();
             }
         });
 
         // Overall button on click listener
-        button3.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                adapterScore.clear();
-                adapterUser.clear();
-                for(int i = 0; i < userList.size(); i++){
-                    adapterUser.add(userList.get(i));
-                    adapterScore.add(scoreList.get(i));
-                }
-                adapter.notifyDataSetChanged();
+        buttonOverAll.setOnClickListener(v -> {
+            this.adapterScore.clear();
+            this.adapterUser.clear();
+            for(int i = 0; i < userList.size(); i++){
+                this.adapterUser.add(userList.get(i));
+                this.adapterScore.add(scoreList.get(i));
             }
+            this.adapter.notifyDataSetChanged();
         });
         return view;
     }
 
+    /**
+     * Function update the user and score list once there is new entry in FireBase.
+     */
     private void onDBUpdate(){
-        root.addChildEventListener(new ChildEventListener() {
+        this.root.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 for (DataSnapshot user : dataSnapshot.getChildren()){
@@ -188,8 +181,13 @@ public class HighscoreFragment extends Fragment{
         });
     }
 
-
-    // sort the lists
+    /**
+     * Sort the list.
+     * @param sList score list to be sorted.
+     * @param uList user list to be sorted.
+     * @param low is the lowest index in the sublist.
+     * @param high is the highest index in the sublist.
+     */
     private void sort(List<Long> sList, List<String> uList, int low, int high){
         int i = low, j = high;
 
@@ -244,12 +242,11 @@ public class HighscoreFragment extends Fragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
-            mListener = (HighscoreFragment.OnFragmentInteractionListener) context;
+            this.mListener = (HighscoreFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
-
 
 }

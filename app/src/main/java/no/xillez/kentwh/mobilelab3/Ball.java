@@ -181,7 +181,7 @@ public class Ball extends GameObject
             this.enableShield = true;
             interactionCallback.triggerShield(true);
             interactionCallback.triggerItemPoint();
-            effectDissTimer.start();
+            effectDisTimer.start();
         }
         // Debris growth effect
         else if (effect == 2)
@@ -189,7 +189,7 @@ public class Ball extends GameObject
             hasEffect = true;
             interactionCallback.triggerDebrisSizeGrowth(true);
             interactionCallback.triggerItemPoint();
-            effectDissTimer.start();
+            effectDisTimer.start();
         }
 
         // Remove current item picked up
